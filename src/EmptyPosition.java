@@ -1,0 +1,56 @@
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+
+public class EmptyPosition implements IRecord {
+
+    private long position;
+    public static final int SIZE = Long.BYTES;
+
+    public EmptyPosition(long position) {
+        this.position = position;
+    }
+
+    public EmptyPosition() {
+        position = -1;
+    }
+
+    @Override
+    public void setValid(boolean valid) {
+        throw new IllegalStateException("This makes nothing!");
+    }
+
+    public long getPosition() {
+        return position;
+    }
+
+    @Override
+    public byte[] toByteArray() {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+
+        try {
+            dataOutputStream.writeLong(this.position);
+            return byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new IllegalStateException("ToByteArray");
+        }
+    }
+
+    @Override
+    public void fromByteArray(byte[] array) {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(array);
+        DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
+        try {
+            position = dataInputStream.readLong();
+        } catch (Exception e) {
+            throw new IllegalStateException("FromByteArray");
+        }
+    }
+
+    @Override
+    public int getSize() {
+        return Long.BYTES;
+    }
+}
