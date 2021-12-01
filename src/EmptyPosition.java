@@ -3,7 +3,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
-public class EmptyPosition implements IRecord<EmptyPosition> {
+public class EmptyPosition implements IData<EmptyPosition> {
 
     private long position;
     public static final int SIZE = Long.BYTES;
@@ -18,7 +18,12 @@ public class EmptyPosition implements IRecord<EmptyPosition> {
 
     @Override
     public void setValid(boolean valid) {
-        throw new IllegalStateException("This makes nothing!");
+        throw new IllegalStateException("Should not call this!");
+    }
+
+    @Override
+    public boolean isValid() {
+        throw new IllegalStateException("Should not call this!");
     }
 
     public long getPosition() {
@@ -29,7 +34,6 @@ public class EmptyPosition implements IRecord<EmptyPosition> {
     public byte[] toByteArray() {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
-
         try {
             dataOutputStream.writeLong(this.position);
             return byteArrayOutputStream.toByteArray();
@@ -57,6 +61,12 @@ public class EmptyPosition implements IRecord<EmptyPosition> {
     @Override
     public EmptyPosition createClass() {
         return new EmptyPosition();
+    }
+
+    @Override
+    public int compareTo(EmptyPosition object) {
+        Long position = this.position;
+        return position.compareTo(object.position);
     }
 
     @Override

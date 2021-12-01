@@ -1,20 +1,22 @@
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-public class DataFile<T extends IRecord> {
-
+public class DataFile<T extends IData<T>> {
 
     private final RandomAccessFile file;
     private final RandomAccessFile emptyPositions;
 
-
-    public DataFile() {
+    public DataFile(String filename) {
         try {
-            file = new RandomAccessFile("data.txt", "rw");
-            emptyPositions = new RandomAccessFile("emptyPositions.txt", "rw");
+            file = new RandomAccessFile(filename + ".txt", "rw");
+            emptyPositions = new RandomAccessFile(filename + "EmptyPositions.txt", "rw");
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
+    public void clearData() {
+        try {
             file.setLength(0);
             emptyPositions.setLength(0);
         } catch (Exception e) {
@@ -22,29 +24,18 @@ public class DataFile<T extends IRecord> {
         }
     }
 
-
     public long write(T data) {
         try {
-
-            //System.out.println("filePointer: " + outputFile.getFilePointer());
-            //System.out.println("length: " + outputFile.length() + " pointer: " + outputFile.getFilePointer());
-
             long writePosition;
             if (emptyPositions.length() > 0) {
-                System.out.println("emptyPosition: " + getEmptyPosition());
                 writePosition = getEmptyPosition();
+                System.out.println("emptyPosition: " + writePosition);
             } else {
                 writePosition = file.length();
+                System.out.println("newPosition: " + writePosition);
             }
-
             file.seek(writePosition);
             file.write(data.toByteArray());
-            //System.out.println("byte length: " + data.toByteArray().length);
-            //file.close();
-
-            //System.out.println("filePointer: " + outputFile.getFilePointer());
-            System.out.println("writePosition: " + writePosition);
-
             if (emptyPositions.length() > 0)
                 emptyPositions.setLength(emptyPositions.length() - EmptyPosition.SIZE);
             return writePosition;
@@ -56,11 +47,21 @@ public class DataFile<T extends IRecord> {
     public long getEmptyPosition() {
         try {
             EmptyPosition emptyPosition = new EmptyPosition();
-
             byte[] b = new byte[emptyPosition.getSize()];
-            emptyPositions.seek(emptyPositions.length() - EmptyPosition.SIZE);
+            emptyPositions.seek(emptyPositions.length() - emptyPosition.getSize());
             emptyPositions.read(b);
             emptyPosition.fromByteArray(b);
+
+            while (emptyPosition.getPosition() > file.length()) {
+                emptyPositions.setLength(emptyPositions.length() - emptyPosition.getSize());
+                if (emptyPositions.length() > 0) {
+                    emptyPositions.seek(emptyPositions.length() - emptyPosition.getSize());
+                    emptyPositions.read(b);
+                    emptyPosition.fromByteArray(b);
+                } else {
+                    return file.length();
+                }
+            }
 
             return emptyPosition.getPosition();
         } catch (Exception e) {
@@ -70,16 +71,9 @@ public class DataFile<T extends IRecord> {
 
     public byte[] read(long position, int size) {
         try {
-
-            //System.out.println("filePointer: " + outputFile.getFilePointer());
-            //System.out.println("length: " + outputFile.length() + " pointer: " + outputFile.getFilePointer());
-
             byte[] b = new byte[size];
             file.seek(position);
             file.read(b);
-
-            //file.close();
-
             return b;
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -97,7 +91,6 @@ public class DataFile<T extends IRecord> {
                 list.add(newData);
                 file.seek(file.getFilePointer());
             }
-
             return list;
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -126,17 +119,23 @@ public class DataFile<T extends IRecord> {
             data.setValid(false);
             file.seek(position);
             file.write(data.toByteArray());
-
-            //System.out.println("filePointer" + file.getFilePointer());
             if (file.getFilePointer() == file.length()) {
                 file.setLength(file.length() - data.getSize());
+
+                while (file.length() > 0) {
+                    T tempData = (T) data.createClass();
+                    tempData.fromByteArray(this.read(file.length() - data.getSize(), tempData.getSize()));
+                    if (!tempData.isValid()) {
+                        file.setLength(file.length() - data.getSize());
+                    } else {
+                        break;
+                    }
+                }
             } else {
                 EmptyPosition emptyPosition = new EmptyPosition(position);
                 emptyPositions.seek(emptyPositions.length());
                 emptyPositions.write(emptyPosition.toByteArray());
             }
-
-            //file.close();
             return data.toByteArray();
         } catch (Exception e) {
             throw new IllegalStateException(e);
