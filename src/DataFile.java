@@ -1,12 +1,13 @@
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
+import java.util.ArrayList;
 
 public class DataFile<T extends IRecord> {
 
 
-    private RandomAccessFile file;
-    private RandomAccessFile emptyPositions;
+    private final RandomAccessFile file;
+    private final RandomAccessFile emptyPositions;
 
 
     public DataFile() {
@@ -85,15 +86,55 @@ public class DataFile<T extends IRecord> {
         }
     }
 
+    public ArrayList<T> getAllData(T data) {
+        ArrayList<T> list = new ArrayList<>();
+        try {
+            byte[] b = new byte[data.getSize()];
+            file.seek(0);
+            while (file.read(b) != -1) {
+                T newData = (T) data.createClass();
+                newData.fromByteArray(b);
+                list.add(newData);
+                file.seek(file.getFilePointer());
+            }
+
+            return list;
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public ArrayList<EmptyPosition> getAllEmptyPositions(EmptyPosition data) {
+        ArrayList<EmptyPosition> list = new ArrayList<>();
+        try {
+            byte[] b = new byte[data.getSize()];
+            emptyPositions.seek(0);
+            while (emptyPositions.read(b) != -1) {
+                EmptyPosition newData = (EmptyPosition) data.createClass();
+                newData.fromByteArray(b);
+                list.add(newData);
+                emptyPositions.seek(emptyPositions.getFilePointer());
+            }
+            return list;
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public byte[] delete(long position, T data) {
         try {
             data.setValid(false);
             file.seek(position);
             file.write(data.toByteArray());
 
-            EmptyPosition emptyPosition = new EmptyPosition(position);
-            emptyPositions.seek(emptyPositions.length());
-            emptyPositions.write(emptyPosition.toByteArray());
+            //System.out.println("filePointer" + file.getFilePointer());
+            if (file.getFilePointer() == file.length()) {
+                file.setLength(file.length() - data.getSize());
+            } else {
+                EmptyPosition emptyPosition = new EmptyPosition(position);
+                emptyPositions.seek(emptyPositions.length());
+                emptyPositions.write(emptyPosition.toByteArray());
+            }
 
             //file.close();
             return data.toByteArray();

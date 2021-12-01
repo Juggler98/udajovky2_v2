@@ -1,6 +1,6 @@
 import java.io.*;
 
-public class TestClass implements IRecord {
+public class TestClass implements IRecord<TestClass> {
 
     private Integer value;
     private boolean valid = true;
@@ -59,6 +59,11 @@ public class TestClass implements IRecord {
     @Override
     public int getSize() {
         return Integer.BYTES + 1;
+    }
+
+    @Override
+    public TestClass createClass() {
+        return new TestClass();
     }
 
     @Override

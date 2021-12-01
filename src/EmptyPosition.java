@@ -3,7 +3,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
-public class EmptyPosition implements IRecord {
+public class EmptyPosition implements IRecord<EmptyPosition> {
 
     private long position;
     public static final int SIZE = Long.BYTES;
@@ -52,5 +52,17 @@ public class EmptyPosition implements IRecord {
     @Override
     public int getSize() {
         return Long.BYTES;
+    }
+
+    @Override
+    public EmptyPosition createClass() {
+        return new EmptyPosition();
+    }
+
+    @Override
+    public String toString() {
+        return "EmptyPosition{" +
+                "position=" + position +
+                '}';
     }
 }

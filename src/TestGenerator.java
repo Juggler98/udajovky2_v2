@@ -25,7 +25,7 @@ public class TestGenerator {
         Random random1 = new Random();
         for (int j = 0; j < testCount; j++) {
             System.out.println("--------------------------NEW-TEST-------------------------------------");
-            int operationCount = 100;
+            int operationCount = 1000;
             int addCount = 0;
             int removeCount = 0;
             int addNotPossible = 0;
@@ -45,9 +45,12 @@ public class TestGenerator {
                 }
             }
 
-            int addPercentage = 100;
+            int addPercentage = 50;
             int removePercentage = 100 - addPercentage;
-            int randomNumberBound = 10;
+            int randomNumberBound = 1000;
+
+            DataFile<TestClass> dataFile = new DataFile<>();
+
             if (goRandom) {
                 for (int i = 0; i < operationCount; i++) {
                     if (i % 10000 == 0) {
@@ -62,18 +65,28 @@ public class TestGenerator {
                         if (arrayListNotAdd) {
                             testArrayList.add(testClass.getValue());
                             testClasses.add(testClass);
+                            filePositions.add(dataFile.write(testClass));
                         }
                     } else {
-                            removeCount++;
+                        removeCount++;
+                        if (testArrayList.size() > 0) {
                             int keyToDelete = testArrayList.get(random.nextInt(testArrayList.size()));
                             System.out.println("Remove: " + keyToDelete);
-                            if (testArrayList.contains(keyToDelete)) {
-                                testArrayList.remove((Integer) keyToDelete);
+                            for (int deleteIndex = 0; deleteIndex < testArrayList.size(); deleteIndex++) {
+                                if (testArrayList.get(deleteIndex) == keyToDelete) {
+                                    testArrayList.remove(deleteIndex);
+                                    testClasses.remove(deleteIndex);
+                                    dataFile.delete(filePositions.get(deleteIndex), testClass);
+                                    filePositions.remove(deleteIndex);
+                                    break;
+                                }
                             }
+                        } else {
+                            removeNotPossible++;
+                        }
                     }
                 }
 
-                DataFile<TestClass> d = new DataFile<>();
 
                 //System.out.println("---------NUMBERS-IN-ARRAYLIST----------");
                 //Collections.sort(testArrayList);
@@ -83,25 +96,63 @@ public class TestGenerator {
 
                 System.out.println("---------NUMBERS-IN-CLASS-ARRAYLIST----------");
                 for (TestClass t : testClasses) {
-                    filePositions.add(d.write(t));
                     System.out.println(t.getValue());
                 }
 
-                TestClass temp = new TestClass();
-                temp.fromByteArray(d.read(0, temp.getSize()));
-                System.out.println(temp);
+                System.out.println("----------------DATA-IN-FILE-----------------");
 
-                d.delete(0, temp);
+                for (long i : filePositions) {
+                    TestClass t = new TestClass();
+                    t.fromByteArray(dataFile.read(i, t.getSize()));
+                    System.out.println(t);
+                }
 
-                temp.fromByteArray(d.read(0, temp.getSize()));
-                System.out.println(temp);
+                System.out.println("----------------DATA-IN-FILE-----------------");
+                ArrayList<TestClass> tempArrayList = dataFile.getAllData(new TestClass());
+                for (TestClass t : tempArrayList) {
+                    System.out.println(t);
+                }
 
-                temp.setValue(100);
-                temp.setValid(true);
-                d.write(temp);
 
-                temp.fromByteArray(d.read(0, temp.getSize()));
-                System.out.println(temp);
+                System.out.println("----------------EMPTY-POSITIONS-----------------");
+                ArrayList<EmptyPosition> emptyPositionsArrayList = dataFile.getAllEmptyPositions(new EmptyPosition());
+                for (EmptyPosition t : emptyPositionsArrayList) {
+                    System.out.println(t);
+                }
+
+                TestClass temp = new TestClass(100);
+                dataFile.write(temp);
+
+                System.out.println("----------------DATA-IN-FILE-----------------");
+                tempArrayList = dataFile.getAllData(new TestClass());
+                for (TestClass t : tempArrayList) {
+                    System.out.println(t);
+                }
+
+
+                System.out.println("----------------EMPTY-POSITIONS-----------------");
+                emptyPositionsArrayList = dataFile.getAllEmptyPositions(new EmptyPosition());
+                for (EmptyPosition t : emptyPositionsArrayList) {
+                    System.out.println(t);
+                }
+
+
+
+//                TestClass temp = new TestClass();
+//                temp.fromByteArray(dataFile.read(0, temp.getSize()));
+//                System.out.println(temp);
+//
+//                dataFile.delete(0, temp);
+//
+//                temp.fromByteArray(dataFile.read(0, temp.getSize()));
+//                System.out.println(temp);
+//
+//                temp.setValue(100);
+//                temp.setValid(true);
+//                dataFile.write(temp);
+//
+//                temp.fromByteArray(dataFile.read(0, temp.getSize()));
+//                System.out.println(temp);
 
 
             }
