@@ -1,3 +1,7 @@
+package data;
+
+import models.IData;
+
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 

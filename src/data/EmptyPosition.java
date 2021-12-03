@@ -1,3 +1,7 @@
+package data;
+
+import models.IData;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -71,7 +75,7 @@ public class EmptyPosition implements IData<EmptyPosition> {
 
     @Override
     public String toString() {
-        return "EmptyPosition{" +
+        return "data.EmptyPosition{" +
                 "position=" + position +
                 '}';
     }

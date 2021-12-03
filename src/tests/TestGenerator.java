@@ -1,16 +1,20 @@
+package tests;
+
+import data.DataFile;
+import data.EmptyPosition;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 public class TestGenerator {
 
-    DataFile<TestClass> dataFile = new DataFile<>("TestClass", new TestClass());
+    DataFile<TestClass> dataFile = new DataFile<>("tests.TestClass", new TestClass());
 
     public TestGenerator() {
     }
 
     public void runTests() {
-        int testCount = 100;
+        int testCount = 1;
         Random randomValue = new Random();
         Random randomForOperation = new Random();
         Random randomSeed = new Random();
@@ -121,7 +125,7 @@ public class TestGenerator {
                     break;
                 }
 
-//                TestClass temp = new TestClass();
+//                tests.TestClass temp = new tests.TestClass();
 //                temp.fromByteArray(dataFile.read(0, temp.getSize()));
 //                System.out.println(temp);
 //

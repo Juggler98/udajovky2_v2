@@ -1,3 +1,5 @@
+package models;
+
 public interface IData<T> {
 
     public byte[] toByteArray();

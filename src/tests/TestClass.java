@@ -1,3 +1,7 @@
+package tests;
+
+import models.IData;
+
 import java.io.*;
 
 public class TestClass implements IData<TestClass> {
@@ -95,7 +99,7 @@ public class TestClass implements IData<TestClass> {
 
     @Override
     public String toString() {
-        return "TestClass{" +
+        return "tests.TestClass{" +
                 "value=" + value +
                 " retazec=" + retazec +
                 ", valid=" + valid +
