@@ -5,11 +5,13 @@ public class DataFile<T extends IData<T>> {
 
     private final RandomAccessFile file;
     private final RandomAccessFile emptyPositions;
+    private final T data;
 
-    public DataFile(String filename) {
+    public DataFile(String filename, T data) {
         try {
             file = new RandomAccessFile(filename + ".txt", "rw");
             emptyPositions = new RandomAccessFile(filename + "EmptyPositions.txt", "rw");
+            this.data = data;
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -69,7 +71,8 @@ public class DataFile<T extends IData<T>> {
         }
     }
 
-    public byte[] read(long position, int size) {
+    public byte[] read(long position) {
+        int size = this.data.getSize();
         try {
             byte[] b = new byte[size];
             file.seek(position);
@@ -80,7 +83,7 @@ public class DataFile<T extends IData<T>> {
         }
     }
 
-    public ArrayList<T> getAllData(T data) {
+    public ArrayList<T> getAllData() {
         ArrayList<T> list = new ArrayList<>();
         try {
             byte[] b = new byte[data.getSize()];
@@ -97,13 +100,14 @@ public class DataFile<T extends IData<T>> {
         }
     }
 
-    public ArrayList<EmptyPosition> getAllEmptyPositions(EmptyPosition data) {
+    public ArrayList<EmptyPosition> getAllEmptyPositions() {
+        EmptyPosition data = new EmptyPosition();
         ArrayList<EmptyPosition> list = new ArrayList<>();
         try {
             byte[] b = new byte[data.getSize()];
             emptyPositions.seek(0);
             while (emptyPositions.read(b) != -1) {
-                EmptyPosition newData = (EmptyPosition) data.createClass();
+                EmptyPosition newData = new EmptyPosition();
                 newData.fromByteArray(b);
                 list.add(newData);
                 emptyPositions.seek(emptyPositions.getFilePointer());
@@ -114,7 +118,8 @@ public class DataFile<T extends IData<T>> {
         }
     }
 
-    public byte[] delete(long position, T data) {
+    public byte[] delete(long position) {
+        T data = this.data.createClass();
         try {
             data.setValid(false);
             file.seek(position);
@@ -124,7 +129,7 @@ public class DataFile<T extends IData<T>> {
 
                 while (file.length() > 0) {
                     T tempData = (T) data.createClass();
-                    tempData.fromByteArray(this.read(file.length() - data.getSize(), tempData.getSize()));
+                    tempData.fromByteArray(this.read(file.length() - data.getSize()));
                     if (!tempData.isValid()) {
                         file.setLength(file.length() - data.getSize());
                     } else {

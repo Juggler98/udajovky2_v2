@@ -4,7 +4,7 @@ import java.util.Random;
 
 public class TestGenerator {
 
-    DataFile<TestClass> dataFile = new DataFile<>("TestClass");
+    DataFile<TestClass> dataFile = new DataFile<>("TestClass", new TestClass());
 
     public TestGenerator() {
     }
@@ -66,8 +66,8 @@ public class TestGenerator {
                             for (int deleteIndex = 0; deleteIndex < testArrayList.size(); deleteIndex++) {
                                 if (testArrayList.get(deleteIndex) == keyToDelete) {
                                     testArrayList.remove(deleteIndex);
-                                    TestClass deletedClass = testClasses.remove(deleteIndex);
-                                    dataFile.delete(filePositions.get(deleteIndex), deletedClass);
+                                    testClasses.remove(deleteIndex);
+                                    dataFile.delete(filePositions.get(deleteIndex));
                                     filePositions.remove(deleteIndex);
                                     break;
                                 }
@@ -86,7 +86,7 @@ public class TestGenerator {
                 System.out.println("-----DATA-IN-FILE-FROM-POSITION-ARRAYLIST-------");
                 for (long i : filePositions) {
                     TestClass t = new TestClass();
-                    t.fromByteArray(dataFile.read(i, t.getSize()));
+                    t.fromByteArray(dataFile.read(i));
                     System.out.println(t);
                 }
 
@@ -106,7 +106,7 @@ public class TestGenerator {
                 for (int i = 0; i < filePositions.size(); i++) {
                     long position = filePositions.get(i);
                     TestClass t = new TestClass();
-                    t.fromByteArray(dataFile.read(position, t.getSize()));
+                    t.fromByteArray(dataFile.read(position));
                     if (t.compareTo(testClasses.get(i)) != 0) {
                         dataIsGood = false;
                         break;
@@ -154,15 +154,14 @@ public class TestGenerator {
                 this.dataInFileToConsole();
 
                 System.out.println("\nDelete 0 2 4");
-                TestClass testClass = new TestClass();
-                dataFile.delete(0, testClass);
-                dataFile.delete(45, testClass);
-                dataFile.delete(90, testClass);
+                dataFile.delete(0);
+                dataFile.delete(45);
+                dataFile.delete(90);
                 this.emptyPositionsToConsole();
                 this.dataInFileToConsole();
 
                 System.out.println("delete 5");
-                dataFile.delete(135, testClass);
+                dataFile.delete(135);
                 this.dataInFileToConsole();
                 this.emptyPositionsToConsole();
 
@@ -176,7 +175,7 @@ public class TestGenerator {
 
     public void emptyPositionsToConsole() {
         System.out.println("----------------EMPTY-POSITIONS-----------------");
-        ArrayList<EmptyPosition> emptyPositionsArrayList = dataFile.getAllEmptyPositions(new EmptyPosition());
+        ArrayList<EmptyPosition> emptyPositionsArrayList = dataFile.getAllEmptyPositions();
         for (EmptyPosition t : emptyPositionsArrayList) {
             System.out.println(t);
         }
@@ -184,7 +183,7 @@ public class TestGenerator {
 
     public void dataInFileToConsole() {
         System.out.println("----------------DATA-IN-FILE-----------------");
-        ArrayList<TestClass> tempArrayList = dataFile.getAllData(new TestClass());
+        ArrayList<TestClass> tempArrayList = dataFile.getAllData();
         for (TestClass t : tempArrayList) {
             System.out.println(t);
         }
