@@ -1,21 +1,119 @@
 package twoThreeTree;
 
+import models.IData;
 
-import universalTree.TreeKey;
-import universalTree.TreeNode;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
-public class TTTreeNode<K extends Comparable<K>, T extends Comparable<T> & TreeKey<K>> implements TreeNode {
+public class TTTreeNode<T extends IData<T>> implements IData {
 
-    private TTTreeNode<K, T> parent;
-    private TTTreeNode<K, T> leftSon;
-    private TTTreeNode<K, T> middleSon;
-    private TTTreeNode<K, T> rightSon;
+    private long parent = -1;
+    private long leftSon = -1;
+    private long middleSon = -1;
+    private long rightSon = -1;
 
+    private long myPosition = -1;
+    //private long positionsDataL = -1;
+    //private long positionDataR = -1;
     private T dataL;
     private T dataR;
 
-    TTTreeNode(T data) {
+    public TTTreeNode(long myPosition, T data) {
         this.dataL = data;
+        this.dataR = dataL.createClass();
+        //this.positionsDataL = dataPosition;
+        this.myPosition = myPosition;
+    }
+
+    public TTTreeNode(T data) {
+        dataL = data;
+        dataR = dataL.createClass();
+    }
+
+//    public TTTreeNode() {
+//        dataL = dataL.createClass();
+//        dataR = dataL.createClass();
+//    }
+
+    @Override
+    public byte[] toByteArray() {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+        try {
+            dataOutputStream.writeLong(this.parent);
+            dataOutputStream.writeLong(this.leftSon);
+            dataOutputStream.writeLong(this.middleSon);
+            dataOutputStream.writeLong(this.rightSon);
+            dataOutputStream.write(dataL.toByteArray());
+            dataOutputStream.write(dataR.toByteArray());
+            return byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    @Override
+    public void fromByteArray(byte[] array) {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(array);
+        DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
+        try {
+            parent = dataInputStream.readLong();
+            leftSon = dataInputStream.readLong();
+            middleSon = dataInputStream.readLong();
+            rightSon = dataInputStream.readLong();
+            byte[] b = new byte[dataL.getSize()];
+            dataInputStream.read(b);
+            dataL.fromByteArray(b);
+            dataInputStream.read(b);
+            dataR.fromByteArray(b);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public long getMyPosition() {
+        return myPosition;
+    }
+
+    public void setMyPosition(long myPosition) {
+        this.myPosition = myPosition;
+    }
+
+    //public long getPositionsDataL() {
+      //  return positionsDataL;
+    //}
+
+    //public long getPositionDataR() {
+      //  return positionDataR;
+    //}
+
+    @Override
+    public int getSize() {
+        return Long.BYTES * 4 + 2 * dataL.getSize();
+    }
+
+    @Override
+    public void setValid(boolean valid) {
+
+    }
+
+    @Override
+    public boolean isValid() {
+        return false;
+    }
+
+    @Override
+    public Object createClass() {
+        return new TTTreeNode<>(dataL.createClass());
+    }
+
+    @Override
+    public int compareTo(Object object) {
+        Long m = myPosition;
+        TTTreeNode<T> o = (TTTreeNode<T>) object;
+        return m.compareTo(o.myPosition);
     }
 
     public boolean isThreeNode() {
@@ -34,14 +132,14 @@ public class TTTreeNode<K extends Comparable<K>, T extends Comparable<T> & TreeK
         }
         if (isThreeNode()) {
             System.out.println("3 NODE");
-            System.out.println("L: " + dataL.getKey()); //TODO: I should use here toString() and don't extends TreeKey<> !!!
-            System.out.println("R: " + dataR.getKey());
+            System.out.println("L: " + dataL);
+            System.out.println("R: " + dataR);
         } else {
             System.out.println("2 NODE");
-            System.out.println("L: " + dataL.getKey());
+            System.out.println("L: " + dataL);
         }
         System.out.println();
-        if (dataL.getKey() == null || dataL == null) {
+        if (dataL == null) {
             System.out.println("-------------Error-------keyL-or-dataL---------");
         }
     }
@@ -50,19 +148,20 @@ public class TTTreeNode<K extends Comparable<K>, T extends Comparable<T> & TreeK
         return !hasMiddleSon() && !hasRightSon() && !hasLeftSon();
     }
 
-    public void setMiddleSon(TTTreeNode<K, T> middleSon) {
+    public void setMiddleSon(long middleSon) {
         this.middleSon = middleSon;
     }
 
     public void setDataL(T dataL) {
         this.dataL = dataL;
+        //this.positionsDataL = positionsDataL;
     }
 
     public void setDataR(T dataR) {
         this.dataR = dataR;
     }
 
-    public TTTreeNode<K, T> getMiddleSon() {
+    public long getMiddleSon() {
         return middleSon;
     }
 
@@ -74,42 +173,42 @@ public class TTTreeNode<K extends Comparable<K>, T extends Comparable<T> & TreeK
         return dataR;
     }
 
-    public void setParent(TTTreeNode<K, T> parent) {
+    public void setParent(long parent) {
         this.parent = parent;
     }
 
-    public void setLeftSon(TTTreeNode<K, T> leftSon) {
+    public void setLeftSon(long leftSon) {
         this.leftSon = leftSon;
     }
 
-    public void setRightSon(TTTreeNode<K, T> rightSon) {
+    public void setRightSon(long rightSon) {
         this.rightSon = rightSon;
     }
 
-    public TTTreeNode<K, T> getParent() {
+    public long getParent() {
         return parent;
     }
 
-    public TTTreeNode<K, T> getLeftSon() {
+    public long getLeftSon() {
         return leftSon;
     }
 
-    public TTTreeNode<K, T> getRightSon() {
+    public long getRightSon() {
         return rightSon;
     }
 
     public boolean hasLeftSon() {
-        return this.leftSon != null;
+        return this.leftSon != -1;
     }
 
     public boolean hasRightSon() {
-        return this.rightSon != null;
+        return this.rightSon != -1;
     }
 
-    public boolean hasParent() {return this.parent != null;}
+    public boolean hasParent() {return this.parent != -1;}
 
     public boolean hasMiddleSon() {
-        return this.middleSon != null;
+        return this.middleSon != -1;
     }
 
     public boolean hasDataL() {
@@ -117,7 +216,19 @@ public class TTTreeNode<K extends Comparable<K>, T extends Comparable<T> & TreeK
     }
 
     public boolean hasDataR() {
-        return this.dataR != null;
+        return this.dataR.isValid();
     }
 
+    @Override
+    public String toString() {
+        return "TTTreeNode{" +
+                "parent=" + parent +
+                ", leftSon=" + leftSon +
+                ", middleSon=" + middleSon +
+                ", rightSon=" + rightSon +
+                ", myPosition=" + myPosition +
+                ", dataL=" + dataL +
+                ", dataR=" + dataR +
+                '}';
+    }
 }

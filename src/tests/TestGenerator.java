@@ -2,22 +2,27 @@ package tests;
 
 import data.DataFile;
 import data.EmptyPosition;
+import twoThreeTree.TTTree;
+import twoThreeTree.TTTreeNode;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 public class TestGenerator {
 
-    DataFile<TestClass> dataFile = new DataFile<>("tests.TestClass", new TestClass());
+    DataFile<TestClass> dataFile = new DataFile<>("0TestClass", new TestClass());
+    TTTree<TestClassIndex> testTree;
+    Random randomValue = new Random();
+    Random randomForOperation = new Random();
+    Random randomSeed = new Random();
 
     public TestGenerator() {
     }
 
     public void runTests() {
         int testCount = 1;
-        Random randomValue = new Random();
-        Random randomForOperation = new Random();
-        Random randomSeed = new Random();
         for (int j = 0; j < testCount; j++) {
             dataFile.clearData();
             System.out.println("--------------------------NEW-TEST-------------------------------------");
@@ -177,6 +182,186 @@ public class TestGenerator {
         }
     }
 
+    public void runTestsTree() {
+        int testCount = 1;
+        for (int j = 0; j < testCount; j++) {
+            dataFile.clearData();
+            System.out.println("--------------------------NEW-TEST-------------------------------------");
+            int operationCount = 10;
+            int addCount = 0;
+            int removeCount = 0;
+            int addNotPossible = 0;
+            int removeNotPossible = 0;
+            int randomValueSeed = randomSeed.nextInt(10000000);
+            int randomForOperationSeed = randomSeed.nextInt(10000000);
+            System.out.println("RandomValueSeed: " + randomValueSeed + " RandomForOperationSeed: " + randomForOperationSeed);
+            randomValue.setSeed(2889700);
+            randomForOperation.setSeed(1236486);
+            ArrayList<Integer> testArrayList = new ArrayList<>();
+            testTree = new TTTree<>("0testingTree", new TTTreeNode<>(new TestClassIndex()));
+            ArrayList<TestClass> testClasses = new ArrayList<>();
+
+            boolean goRandom = true;
+
+            TestClass[] testNumbers = new TestClass[20];
+            if (!goRandom) {
+                for (int i = 0; i < testNumbers.length; i++) {
+                    testNumbers[i] = new TestClass(i, "nothing");
+                }
+            }
+
+            int addPercentage = 50;
+            int randomNumberBound = 100;
+            if (goRandom) {
+                for (int i = 0; i < operationCount; i++) {
+                    if (i % 10000 == 0) {
+                        System.out.println(i + " operation");
+                    }
+                    TestClass testClass = new TestClass(randomValue.nextInt(randomNumberBound), "nothing");
+                    int randomOperation = randomForOperation.nextInt(100);
+                    if (randomOperation < addPercentage) {
+                        System.out.println("ADD: " + testClass.getValue());
+                        addCount++;
+                        boolean arrayListNotAdd = !testArrayList.contains(testClass.getValue());
+                        boolean treeNotAdd = true;
+                        if (arrayListNotAdd) {
+                            testArrayList.add(testClass.getValue());
+                            testClasses.add(testClass);
+                            TestClassIndex t = new TestClassIndex(testClass.getValue(), dataFile.write(testClass));
+                            treeNotAdd = testTree.add(t);
+                            if (!treeNotAdd) {
+                                addNotPossible++;
+                            }
+                            this.treeToConsole();
+                            //System.out.println("root: " + testTree.getRoot());
+                        }
+                        if (treeNotAdd && !arrayListNotAdd) {
+                            System.out.println(testClass.getValue());
+                            System.out.println("-------Test-Problem------");
+                            System.out.println(randomValueSeed);
+                            System.out.println(randomForOperationSeed);
+                            break;
+                        }
+                    } else {
+                        if (testTree.getSize() > 0) {
+                            removeCount++;
+                            int keyToDelete = testArrayList.get(randomValue.nextInt(testArrayList.size()));
+                            System.out.println("Remove: " + keyToDelete);
+
+                            //TestClass t = new TestClass(keyToDelete, "");
+                            TestClassIndex testClassIndex = new TestClassIndex(keyToDelete);
+
+                            for (int deleteIndex = 0; deleteIndex < testArrayList.size(); deleteIndex++) {
+                                if (testArrayList.get(deleteIndex) == keyToDelete) {
+                                    testArrayList.remove(deleteIndex);
+                                    testClasses.remove(deleteIndex);
+                                    testClassIndex = testTree.remove(testClassIndex);
+                                    dataFile.delete(testClassIndex.getDataPosition());
+                                    break;
+                                }
+                            }
+                        } else {
+                            System.out.println("Empty tree");
+                        }
+                    }
+                }
+
+                System.out.println("---------NUMBERS-IN-ARRAYLIST----------");
+                Collections.sort(testArrayList);
+                for (Integer i : testArrayList) {
+                    System.out.println(i);
+                }
+            } else {
+                TestClassIndex t = new TestClassIndex(testNumbers[0].getValue(), dataFile.write(testNumbers[0]));
+                testTree.add(t);
+
+                this.treeToConsole();
+
+                t = new TestClassIndex(testNumbers[1].getValue(), dataFile.write(testNumbers[1]));
+                testTree.add(t);
+
+                this.treeToConsole();
+
+                System.out.println();
+                this.dataInFileToConsole();
+            }
+
+//            System.out.println("-----------PREORDER------------");
+//            testTree.preorder((TTTreeNode<Integer, tests.TestClass>) testTree.getRoot());
+//
+//            testTree.add(testNumbers[0]);
+//            System.out.println("----------TREE-------------");
+//            testTree.preorder((TTTreeNode<Integer, tests.TestClass>) testTree.getRoot());
+//
+//            testTree.remove(3);
+//            System.out.println("----------TREE-------------");
+//            testTree.preorder((TTTreeNode<Integer, tests.TestClass>) testTree.getRoot());
+//
+//            testTree.remove(8);
+//            tests.TestClass t = new tests.TestClass(3);
+//            testTree.add(t);
+//
+//            System.out.println(((TTTreeNode<?, ?>) testTree.getRoot()).hasParent());
+//
+//            System.out.println("-------After-change-------");
+//
+//            testTree.preorder((TTTreeNode<Integer, tests.TestClass>) testTree.getRoot());
+
+            System.out.println("-----------PREORDER------------");
+            testTree.preorder(testTree.getRoot());
+
+            System.out.println("-----------INORDER------------");
+            testTree.inOrderRecursive(testTree.getRoot());
+
+            System.out.println("---------LEAF-DEEP----------");
+            testTree.deepOfLeaf(testTree.getRoot());
+
+            System.out.println();
+            System.out.println("addCount: " + addCount);
+            System.out.println("notAdded: " + addNotPossible);
+            System.out.println("removeCount: " + removeCount);
+            System.out.println("notRemove: " + removeNotPossible);
+            System.out.println();
+            System.out.println("Tree size: " + testTree.getSize());
+            System.out.println("ArrayList size " + testArrayList.size());
+            System.out.println("Tree height: " + testTree.getHeight());
+
+            System.out.println("Inorder vsetky hodnoty:");
+            ArrayList<TestClassIndex> hodnoty = testTree.getInOrderData();
+            for (TestClassIndex testClass : hodnoty) {
+                System.out.println(testClass.getValue());
+            }
+            System.out.println("Inorder interval:");
+            TestClassIndex t1 = new TestClassIndex(20, 0);
+            TestClassIndex t2 = new TestClassIndex(70, 0);
+            ArrayList<TestClassIndex> hodnotyInterval = testTree.getIntervalData(t1, t2);
+            for (TestClassIndex testClass : hodnotyInterval) {
+                System.out.println(testClass.getValue());
+            }
+
+            boolean dataIsGood = true;
+            Collections.sort(testClasses, (a, b) -> a.compareTo(b));
+            for (int i = 0; i < hodnoty.size(); i++) {
+                TestClassIndex testClassIndex = hodnoty.get(i);
+                TestClass t = new TestClass();
+                t.fromByteArray(dataFile.read(testClassIndex.getDataPosition()));
+                if (t.compareTo(testClasses.get(i)) != 0 && !testClassIndex.getValue().equals(t.getValue())) {
+                    dataIsGood = false;
+                    break;
+                }
+            }
+            if (dataIsGood) {
+                System.out.println("\nVYSLEDOK TESTU:");
+                System.out.println("Uspesny. Data v strome obsahuju a odkazuju na spravne data v neutriedenom subore.");
+            } else {
+                System.out.println("CHYBA!!! Data v strome neobsahuju alebo neodkazuju na spravne data v subore.");
+                System.out.println("RandomValueSeed: " + randomValueSeed + " RandomForOperationSeed: " + randomForOperationSeed);
+                break;
+            }
+
+        }
+    }
+
     public void emptyPositionsToConsole() {
         System.out.println("----------------EMPTY-POSITIONS-----------------");
         ArrayList<EmptyPosition> emptyPositionsArrayList = dataFile.getAllEmptyPositions();
@@ -190,6 +375,15 @@ public class TestGenerator {
         ArrayList<TestClass> tempArrayList = dataFile.getAllData();
         for (TestClass t : tempArrayList) {
             System.out.println(t);
+        }
+    }
+
+    public void treeToConsole() {
+        System.out.println("----------------TREE-FILE------------------");
+        testTree.printInfo();
+        ArrayList<TTTreeNode<TestClassIndex>> arrayList = testTree.getAllData();
+        for (TTTreeNode<TestClassIndex> node : arrayList) {
+            System.out.println(node);
         }
     }
 

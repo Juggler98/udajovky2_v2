@@ -1,33 +1,69 @@
 package models;
 
-import universalTree.TreeKey;
-
 import java.util.Date;
 
-public class PCRTestDate implements Comparable<PCRTestDate>, TreeKey<Date> {
+public class PCRTestDate implements IData<PCRTestDate> {
 
-    private final PCRTest data;
+    private long data = -1;
+    private Date datum;
+    private String kod = "";
+    private boolean valid = true;
 
-    public PCRTestDate(PCRTest data) {
+    public PCRTestDate(long data, Date datum, String kod) {
         this.data = data;
+        this.datum = datum;
+        this.kod = kod;
     }
 
-    public PCRTest getData() {
+    public PCRTestDate(Date datum) {
+        this.datum = datum;
+    }
+
+    public PCRTestDate() {
+    }
+
+    @Override
+    public byte[] toByteArray() {
+        return new byte[0];
+    }
+
+    @Override
+    public void fromByteArray(byte[] array) {
+
+    }
+
+    @Override
+    public int getSize() {
+        return 0;
+    }
+
+    @Override
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
+    @Override
+    public boolean isValid() {
+        return valid;
+    }
+
+    @Override
+    public PCRTestDate createClass() {
+        return new PCRTestDate();
+    }
+
+    public long getData() {
         return data;
     }
 
     @Override
     public int compareTo(PCRTestDate o) {
-        if (this.data.datum.compareTo(o.data.datum) == 0) {
-            return this.data.kodTestu.compareTo(o.data.kodTestu);
+        if (this.datum.compareTo(o.datum) == 0) {
+            return this.kod.compareTo(o.kod);
         } else {
-            return this.data.datum.compareTo(o.data.datum);
+            return this.datum.compareTo(o.datum);
         }
     }
 
-    @Override
-    public Date getKey() {
-        return this.data.datum;
-    }
 
 }

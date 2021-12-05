@@ -1,5 +1,6 @@
 import models.*;
 import twoThreeTree.TTTree;
+import twoThreeTree.TTTreeNode;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -196,44 +197,44 @@ public class GraphicalApp {
     }
 
     private void addSaveButton() {
-        JButton jButton = new JButton("Save");
-        jPanel.add(jButton);
-        jButton.setBounds(jFrameWidth - 120, jFrameHeight - 125, 80, 30);
-
-        jButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String nazovSuboru = JOptionPane.showInputDialog("Zadaj nazov suboru");
-                if (nazovSuboru != null) {
-                    if (app.writeToFile(nazovSuboru)) {
-                        JOptionPane.showMessageDialog(null, "Data boli ulozene do suboru: " + nazovSuboru + ".csv");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Data sa nepodarilo ulozit do suboru: " + nazovSuboru + ".csv");
-                    }
-                }
-            }
-        });
+//        JButton jButton = new JButton("Save");
+//        jPanel.add(jButton);
+//        jButton.setBounds(jFrameWidth - 120, jFrameHeight - 125, 80, 30);
+//
+//        jButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                String nazovSuboru = JOptionPane.showInputDialog("Zadaj nazov suboru");
+//                if (nazovSuboru != null) {
+//                    if (app.writeToFile(nazovSuboru)) {
+//                        JOptionPane.showMessageDialog(null, "Data boli ulozene do suboru: " + nazovSuboru + ".csv");
+//                    } else {
+//                        JOptionPane.showMessageDialog(null, "Data sa nepodarilo ulozit do suboru: " + nazovSuboru + ".csv");
+//                    }
+//                }
+//            }
+//        });
 
     }
 
     private void addLoadButton() {
-        JButton jButton = new JButton("Load");
-        jPanel.add(jButton);
-        jButton.setBounds(jFrameWidth - 120, jFrameHeight - 125 + 31, 80, 30);
-
-        jButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String nazovSuboru = JOptionPane.showInputDialog("Zadaj nazov suboru");
-                if (nazovSuboru != null) {
-                    if (app.loadFromFile(nazovSuboru)) {
-                        JOptionPane.showMessageDialog(null, "Data boli nacitane zo suboru: " + nazovSuboru + ".csv");
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Data sa nepodarilo nacitat zo suboru: " + nazovSuboru + ".csv");
-                    }
-                }
-            }
-        });
+//        JButton jButton = new JButton("Load");
+//        jPanel.add(jButton);
+//        jButton.setBounds(jFrameWidth - 120, jFrameHeight - 125 + 31, 80, 30);
+//
+//        jButton.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                String nazovSuboru = JOptionPane.showInputDialog("Zadaj nazov suboru");
+//                if (nazovSuboru != null) {
+//                    if (app.loadFromFile(nazovSuboru)) {
+//                        JOptionPane.showMessageDialog(null, "Data boli nacitane zo suboru: " + nazovSuboru + ".csv");
+//                    } else {
+//                        JOptionPane.showMessageDialog(null, "Data sa nepodarilo nacitat zo suboru: " + nazovSuboru + ".csv");
+//                    }
+//                }
+//            }
+//        });
     }
 
     private void addVymazTest() {
@@ -420,14 +421,16 @@ public class GraphicalApp {
                         }
                         Date startDate = new Date(year - 1900, month - 1, day);
 
-                        TTTree<Integer, UzemnaJednotka> uzemneJednotky = new TTTree<>();
+                        TTTree<UzemnaJednotka> uzemneJednotky = new TTTree<>("okresPocetPozitivnych", new TTTreeNode<>(new Okres()));
                         ArrayList<UzemnaJednotka> sortedUzemneJednotky = new ArrayList<>();
                         String text = "";
+                        PCRTestDate t1 = new PCRTestDate(startDate);
+                        PCRTestDate t2 = new PCRTestDate(endDate);
                         if (typUzJednotkyZorad == TypUzJednotky.OKRES) {
                             for (Integer okresCode : app.getOkresCodes()) {
                                 Okres okres = app.getOkres(okresCode);
                                 OkresPocetPozitivnych okresPocetPozitivnych = new OkresPocetPozitivnych(okres.getKod(), okres.getNazov());
-                                okresPocetPozitivnych.setPocetPozitivnych(okres.getPozitivneTesty().getIntervalData(startDate, endDate).size());
+                                okresPocetPozitivnych.setPocetPozitivnych(okres.getPozitivneTesty().getIntervalData(t1, t2).size());
                                 uzemneJednotky.add(okresPocetPozitivnych);
                             }
                             text = "Okresy\n";
@@ -435,7 +438,7 @@ public class GraphicalApp {
                             for (Integer krajeCodes : app.getKrajCodes()) {
                                 Kraj kraj = app.getKraj(krajeCodes);
                                 KrajPocetPozitivnych krajPocetPozitivnych = new KrajPocetPozitivnych(kraj.getKod(), kraj.getNazov());
-                                krajPocetPozitivnych.setPocetPozitivnych(kraj.getPozitivneTesty().getIntervalData(startDate, endDate).size());
+                                krajPocetPozitivnych.setPocetPozitivnych(kraj.getPozitivneTesty().getIntervalData(t1, t2).size());
                                 uzemneJednotky.add(krajPocetPozitivnych);
                             }
                             text = "Kraje\n";
@@ -598,27 +601,30 @@ public class GraphicalApp {
 
                         ArrayList<PCRTestDate> testy = new ArrayList<>();
 
+                        PCRTestDate t1 = new PCRTestDate(startDate);
+                        PCRTestDate t2 = new PCRTestDate(endDate);
                         if (typUzJednotkyOsoby == TypUzJednotky.VSETKY) {
-                            testy = app.getPcrTreePositive().getIntervalData(startDate, endDate);
+                            testy = app.getPcrTreePositive().getIntervalData(t1, t2);
                         } else if (typUzJednotkyOsoby == TypUzJednotky.PRACOVISKO) {
-                            testy = app.getPracovisko(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(startDate, endDate);
+                            testy = app.getPracovisko(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(t1, t2);
                         } else if (typUzJednotkyOsoby == TypUzJednotky.OKRES) {
-                            testy = app.getOkres(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(startDate, endDate);
+                            testy = app.getOkres(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(t1, t2);
                         } else if (typUzJednotkyOsoby == TypUzJednotky.KRAJ) {
-                            testy = app.getKraj(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(startDate, endDate);
+                            testy = app.getKraj(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(t1, t2);
                         }
 
                         String[] textArray = new String[testy.size()];
                         String text;
                         int index = 1;
                         for (PCRTestDate test : testy) {
+                            PCRTest t = app.getPCRTest(test.getData());
                             text = "";
-                            Okres okres = app.getOkres(test.getData().getKodOkresu());
-                            Pracovisko pracovisko = app.getPracovisko(test.getData().getKodPracoviska());
+                            Okres okres = app.getOkres(t.getKodOkresu());
+                            Pracovisko pracovisko = app.getPracovisko(t.getKodPracoviska());
                             text += "----------------------------------";
                             text += String.format("\nOsoba %d\n", index);
-                            text += String.format("Rodne cislo: %s\n", test.getData().getRodCisloPacienta());
-                            Osoba osoba = test.getData().getOsoba();
+                            text += String.format("Rodne cislo: %s\n", t.getRodCisloPacienta());
+                            Osoba osoba = t.getOsoba();
                             if (osoba != null) {
                                 text += String.format("Meno: %s\n", osoba.getMeno());
                                 text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());
@@ -626,24 +632,24 @@ public class GraphicalApp {
                             } else {
                                 text += "Dalsie udaje neexistuju\n";
                             }
-                            text += String.format("\nKod testu: %s\n", test.getData().getKodTestu());
-                            Date date = test.getData().getDatum();
+                            text += String.format("\nKod testu: %s\n", t.getKodTestu());
+                            Date date = t.getDatum();
                             String hours = date.getHours() < 10 ? "0" + date.getHours() : "" + date.getHours();
                             String minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : "" + date.getMinutes();
                             text += String.format("Datum testu: %s\n", date.getDate() + "." + (date.getMonth() + 1) + "." + (1900 + date.getYear()) + " " + hours + ":" + minutes);
-                            text += String.format("Kod pracoviska: %s\n", test.getData().getKodPracoviska());
-                            text += String.format("Kod okresu: %s\n", test.getData().getKodOkresu());
-                            text += String.format("Kod kraja: %s\n", test.getData().getKodKraja());
+                            text += String.format("Kod pracoviska: %s\n", t.getKodPracoviska());
+                            text += String.format("Kod okresu: %s\n", t.getKodOkresu());
+                            text += String.format("Kod kraja: %s\n", t.getKodKraja());
                             text += String.format("Nazov pracoviska: %s\n", pracovisko.getNazov());
                             text += String.format("Nazov okresu: %s\n", okres.getNazov());
                             text += String.format("Nazov kraja: %s\n", app.getKrajName(okres.getKodKraja()));
-                            if (test.getData().isVysledok()) {
+                            if (t.isVysledok()) {
                                 text += "Vysledok: Pozitivny\n";
                             } else {
                                 text += "Vysledok: Negativny\n";
                             }
-                            if (test.getData().getPoznamka() != null && !test.getData().getPoznamka().equals("")) {
-                                text += String.format("Poznamka: %s\n", test.getData().getPoznamka());
+                            if (t.getPoznamka() != null && !t.getPoznamka().equals("")) {
+                                text += String.format("Poznamka: %s\n", t.getPoznamka());
                             }
                             textArray[index - 1] = text;
                             index++;
@@ -772,28 +778,32 @@ public class GraphicalApp {
                     month = Integer.parseInt(endDate.getText().substring(3, 5));
                     year = Integer.parseInt(endDate.getText().substring(6));
                     Date endDate = new Date(year - 1900, month - 1, day);
+                    PCRTestDate a = new PCRTestDate(startDate);
+                    PCRTestDate b = new PCRTestDate(endDate);
 
                     ArrayList<PCRTestDate> testy = new ArrayList<>();
 
+                    PCRTestDate t1 = new PCRTestDate(startDate);
+                    PCRTestDate t2 = new PCRTestDate(endDate);
                     if (typVysledokTestu == TypVysledokTestu.VSETKY) {
                         if (typUzJednotkyTesty == TypUzJednotky.VSETKY) {
-                            testy = app.getPcrTreeDate().getIntervalData(startDate, endDate);
+                            testy = app.getPcrTreeDate().getIntervalData(a, b);
                         } else if (typUzJednotkyTesty == TypUzJednotky.PRACOVISKO) {
-                            testy = app.getPracovisko(Integer.parseInt(kodUzJednotky.getText())).getTesty().getIntervalData(startDate, endDate);
+                            testy = app.getPracovisko(Integer.parseInt(kodUzJednotky.getText())).getTesty().getIntervalData(t1, t2);
                         } else if (typUzJednotkyTesty == TypUzJednotky.OKRES) {
-                            testy = app.getOkres(Integer.parseInt(kodUzJednotky.getText())).getTesty().getIntervalData(startDate, endDate);
+                            testy = app.getOkres(Integer.parseInt(kodUzJednotky.getText())).getTesty().getIntervalData(t1, t2);
                         } else if (typUzJednotkyTesty == TypUzJednotky.KRAJ) {
-                            testy = app.getKraj(Integer.parseInt(kodUzJednotky.getText())).getTesty().getIntervalData(startDate, endDate);
+                            testy = app.getKraj(Integer.parseInt(kodUzJednotky.getText())).getTesty().getIntervalData(t1, t2);
                         }
                     } else if (typVysledokTestu == TypVysledokTestu.POZITIVNE) {
                         if (typUzJednotkyTesty == TypUzJednotky.VSETKY) {
-                            testy = app.getPcrTreePositive().getIntervalData(startDate, endDate);
+                            testy = app.getPcrTreePositive().getIntervalData(t1, t2);
                         } else if (typUzJednotkyTesty == TypUzJednotky.PRACOVISKO) {
-                            testy = app.getPracovisko(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(startDate, endDate);
+                            testy = app.getPracovisko(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(t1, t2);
                         } else if (typUzJednotkyTesty == TypUzJednotky.OKRES) {
-                            testy = app.getOkres(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(startDate, endDate);
+                            testy = app.getOkres(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(t1, t2);
                         } else if (typUzJednotkyTesty == TypUzJednotky.KRAJ) {
-                            testy = app.getKraj(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(startDate, endDate);
+                            testy = app.getKraj(Integer.parseInt(kodUzJednotky.getText())).getPozitivneTesty().getIntervalData(t1, t2);
                         }
                     }
 
@@ -801,33 +811,34 @@ public class GraphicalApp {
                     int index = 1;
                     String[] textArray = new String[testy.size()];
                     for (PCRTestDate test : testy) {
+                        PCRTest t = app.getPCRTest(test.getData());
                         text = "";
-                        Okres okres = app.getOkres(test.getData().getKodOkresu());
-                        Pracovisko pracovisko = app.getPracovisko(test.getData().getKodPracoviska());
+                        Okres okres = app.getOkres(t.getKodOkresu());
+                        Pracovisko pracovisko = app.getPracovisko(t.getKodPracoviska());
                         text += "----------------------------------";
                         text += String.format("\nTest %d\n", index);
-                        text += String.format("Kod testu: %s\n", test.getData().getKodTestu());
-                        Date date = test.getData().getDatum();
+                        text += String.format("Kod testu: %s\n", t.getKodTestu());
+                        Date date = t.getDatum();
                         String hours = date.getHours() < 10 ? "0" + date.getHours() : "" + date.getHours();
                         String minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : "" + date.getMinutes();
                         text += String.format("Datum testu: %s\n", date.getDate() + "." + (date.getMonth() + 1) + "." + (1900 + date.getYear()) + " " + hours + ":" + minutes);
-                        text += String.format("Kod pracoviska: %s\n", test.getData().getKodPracoviska());
-                        text += String.format("Kod okresu: %s\n", test.getData().getKodOkresu());
-                        text += String.format("Kod kraja: %s\n", test.getData().getKodKraja());
+                        text += String.format("Kod pracoviska: %s\n", t.getKodPracoviska());
+                        text += String.format("Kod okresu: %s\n", t.getKodOkresu());
+                        text += String.format("Kod kraja: %s\n", t.getKodKraja());
                         text += String.format("Nazov pracoviska: %s\n", pracovisko.getNazov());
                         text += String.format("Nazov okresu: %s\n", okres.getNazov());
                         text += String.format("Nazov kraja: %s\n", app.getKrajName(okres.getKodKraja()));
-                        if (test.getData().isVysledok()) {
+                        if (t.isVysledok()) {
                             text += "Vysledok: Pozitivny\n";
                         } else {
                             text += "Vysledok: Negativny\n";
                         }
-                        if (test.getData().getPoznamka() != null && !test.getData().getPoznamka().equals("")) {
-                            text += String.format("Poznamka: %s\n", test.getData().getPoznamka());
+                        if (t.getPoznamka() != null && !t.getPoznamka().equals("")) {
+                            text += String.format("Poznamka: %s\n", t.getPoznamka());
                         }
                         text += "\nOsoba:\n";
-                        text += String.format("Rodne cislo: %s\n", test.getData().getRodCisloPacienta());
-                        Osoba osoba = test.getData().getOsoba();
+                        text += String.format("Rodne cislo: %s\n", t.getRodCisloPacienta());
+                        Osoba osoba = t.getOsoba();
                         if (osoba != null) {
                             text += String.format("Meno: %s\n", osoba.getMeno());
                             text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());
@@ -951,29 +962,30 @@ public class GraphicalApp {
                         }
                         String[] textArray = new String[testy.size() == 0 ? 1 : testy.size()];
                         textArray[0] = text;
-                        for (PCRTestDate test : testy) {
-                            Okres okres = app.getOkres(test.getData().getKodOkresu());
-                            Pracovisko pracovisko = app.getPracovisko(test.getData().getKodPracoviska());
+                        for (PCRTestDate t : testy) {
+                            PCRTest test = app.getPCRTest(t.getData());
+                            Okres okres = app.getOkres(test.getKodOkresu());
+                            Pracovisko pracovisko = app.getPracovisko(test.getKodPracoviska());
                             text += "----------------------------------";
                             text += String.format("\nTest %d\n", index);
-                            text += String.format("Kod testu: %s\n", test.getData().getKodTestu());
-                            Date date = test.getData().getDatum();
+                            text += String.format("Kod testu: %s\n", test.getKodTestu());
+                            Date date = test.getDatum();
                             String hours = date.getHours() < 10 ? "0" + date.getHours() : "" + date.getHours();
                             String minutes = date.getMinutes() < 10 ? "0" + date.getMinutes() : "" + date.getMinutes();
                             text += String.format("Datum testu: %s\n", date.getDate() + "." + (date.getMonth() + 1) + "." + (1900 + date.getYear()) + " " + hours + ":" + minutes);
-                            text += String.format("Kod pracoviska: %s\n", test.getData().getKodPracoviska());
-                            text += String.format("Kod okresu: %s\n", test.getData().getKodOkresu());
-                            text += String.format("Kod kraja: %s\n", test.getData().getKodKraja());
+                            text += String.format("Kod pracoviska: %s\n", test.getKodPracoviska());
+                            text += String.format("Kod okresu: %s\n", test.getKodOkresu());
+                            text += String.format("Kod kraja: %s\n", test.getKodKraja());
                             text += String.format("Nazov pracoviska: %s\n", pracovisko.getNazov());
                             text += String.format("Nazov okresu: %s\n", okres.getNazov());
                             text += String.format("Nazov kraja: %s\n", app.getKrajName(okres.getKodKraja()));
-                            if (test.getData().isVysledok()) {
+                            if (test.isVysledok()) {
                                 text += "Vysledok: Pozitivny\n";
                             } else {
                                 text += "Vysledok: Negativny\n";
                             }
-                            if (test.getData().getPoznamka() != null && !test.getData().getPoznamka().equals("")) {
-                                text += String.format("Poznamka: %s\n", test.getData().getPoznamka());
+                            if (test.getPoznamka() != null && !test.getPoznamka().equals("")) {
+                                text += String.format("Poznamka: %s\n", test.getPoznamka());
                             }
                             textArray[index - 1] = text;
                             index++;
