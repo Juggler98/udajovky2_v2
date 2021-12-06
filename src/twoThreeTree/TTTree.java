@@ -103,11 +103,63 @@ public class TTTree<T extends IData<T>> {
 
     private long getEmptyPosition() {
         try {
+            if (emptyPositions.length() == 0) {
+                System.out.println("No empty positions, write to: " + file.length());
+                return file.length();
+            }
+            EmptyPosition emptyPosition = new EmptyPosition();
+            byte[] b = new byte[emptyPosition.getSize()];
+            emptyPositions.seek(emptyPositions.length() - emptyPosition.getSize());
+            emptyPositions.read(b);
+            emptyPosition.fromByteArray(b);
 
+            while (emptyPosition.getPosition() > file.length()) {
+                emptyPositions.setLength(emptyPositions.length() - emptyPosition.getSize());
+                if (emptyPositions.length() > 0) {
+                    emptyPositions.seek(emptyPositions.length() - emptyPosition.getSize());
+                    emptyPositions.read(b);
+                    emptyPosition.fromByteArray(b);
+                } else {
+                    return file.length();
+                }
+            }
 
-            return file.length();
+            while (getFromAddress(emptyPosition.getPosition()).hasDataL()) {
+                emptyPositions.setLength(emptyPositions.length() - emptyPosition.getSize());
+                if (emptyPositions.length() > 0) {
+                    emptyPositions.seek(emptyPositions.length() - emptyPosition.getSize());
+                    emptyPositions.read(b);
+                    emptyPosition.fromByteArray(b);
+                } else {
+                    return file.length();
+                }
+            }
+
+            System.out.println("write to Empty position: " + emptyPosition.getPosition());
+            return emptyPosition.getPosition();
         } catch (Exception e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    private void inspectEmptyPositions() {
+        System.out.println("---------ADDING-EMPTY-POSITIONS--------");
+        ArrayList<Long> addedPosition = new ArrayList<>();
+        for (TTTreeNode<T> node : editedNodes) {
+            System.out.println(node);
+            if (!node.hasDataL()) {
+                if (!addedPosition.contains(node.getMyPosition())) {
+                    System.out.println("new empty position: " + node.getMyPosition());
+                    try {
+                        EmptyPosition emptyPosition = new EmptyPosition(node.getMyPosition());
+                        emptyPositions.seek(emptyPositions.length());
+                        emptyPositions.write(emptyPosition.toByteArray());
+                        addedPosition.add(emptyPosition.getPosition());
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+            }
         }
     }
 
@@ -717,10 +769,12 @@ public class TTTree<T extends IData<T>> {
             deletedData = node.getDataR();
             left = false;
         }
+        editedNodes.clear();
         if (!tryToRemove(node, left)) {
             System.out.println("Mazanie sa nepodarilo, kluc: " + deletedData);
             return null;
         }
+        inspectEmptyPositions();
         size--;
         writeInfoData();
         return deletedData;
@@ -735,12 +789,14 @@ public class TTTree<T extends IData<T>> {
         if (node.isLeaf()) {
             if (!node.isThreeNode()) {
                 if (node.compareTo(root) == 0) {
-                    root = null;
+                    root.setDataL(root.getDataL().createClass());
+                    editedNodes.add(root);
                     height--;
                     writeInfoData(-1);
                     return true;
                 } else {
                     node.setDataL(node.getDataL().createClass());
+                    editedNodes.add(node);
                     writeNode(node);
                 }
             } else {
@@ -748,6 +804,7 @@ public class TTTree<T extends IData<T>> {
                     node.setDataL(node.getDataR());
                 }
                 node.setDataR(node.getDataL().createClass());
+                editedNodes.add(node);
                 writeNode(node);
                 return true;
             }
@@ -787,6 +844,7 @@ public class TTTree<T extends IData<T>> {
                     node.setDataL(tempLeftData);
                 }
             }
+            editedNodes.add(node);
             writeNode(node);
             if (inOrderLeaf.isThreeNode()) {
                 inOrderLeaf.setDataL(inOrderLeaf.getDataR());
@@ -794,6 +852,7 @@ public class TTTree<T extends IData<T>> {
             } else {
                 inOrderLeaf.setDataL(inOrderLeaf.getDataL().createClass());
             }
+            editedNodes.add(inOrderLeaf);
             writeNode(inOrderLeaf);
         }
 
@@ -823,6 +882,7 @@ public class TTTree<T extends IData<T>> {
                 if (root == null) {
                     writeInfoData(-1);
                 } else {
+                    editedNodes.add(root);
                     writeNode(root);
                     writeInfoData(root.getMyPosition());
                 }
@@ -873,10 +933,15 @@ public class TTTree<T extends IData<T>> {
                             b.setParent(inOrderLeaf.getMyPosition());
                         }
                     }
+                    editedNodes.add(inOrderLeaf);
+                    editedNodes.add(a);
                     writeNode(inOrderLeaf);
                     writeNode(a);
-                    if (b != null)
+                    if (b != null) {
+                        editedNodes.add(b);
                         writeNode(b);
+                    }
+                    editedNodes.add(parent);
                     writeNode(parent);
                     return true;
                 } else {
@@ -932,11 +997,17 @@ public class TTTree<T extends IData<T>> {
                     }
                     //parent.setLeftSon(null);
                 }
+                editedNodes.add(a);
                 writeNode(a);
-                if (b != null)
+                if (b != null) {
+                    editedNodes.add(b);
                     writeNode(b);
-                if (c != null)
+                }
+                if (c != null) {
+                    editedNodes.add(c);
                     writeNode(c);
+                }
+                editedNodes.add(parent);
                 writeNode(parent);
             } else if (inOrderLeafSonType == TTTreeSonType.RIGHT) {
                 //System.out.println("SonType.RIGHT");
@@ -977,11 +1048,18 @@ public class TTTree<T extends IData<T>> {
                         }
                         b.setDataR(b.getDataL().createClass());
                     }
-                    if (a != null)
+                    if (a != null) {
+                        editedNodes.add(a);
                         writeNode(a);
+                    }
+                    editedNodes.add(b);
                     writeNode(b);
-                    if (c != null)
+                    if (c != null) {
+                        editedNodes.add(c);
                         writeNode(c);
+                    }
+                    editedNodes.add(inOrderLeaf);
+                    editedNodes.add(parent);
                     writeNode(inOrderLeaf);
                     writeNode(parent);
                     return true;
@@ -1014,10 +1092,15 @@ public class TTTree<T extends IData<T>> {
                         parent.setMiddleSon(-1);
 
                         parent.setDataR(parent.getDataL().createClass());
+                        editedNodes.add(a);
+                        editedNodes.add(b);
                         writeNode(a);
                         writeNode(b);
-                        if (c != null)
+                        if (c != null) {
+                            editedNodes.add(c);
                             writeNode(c);
+                        }
+                        editedNodes.add(parent);
                         writeNode(parent);
                     } else {
                         //System.out.println("right son, parent 2 vrchol");
@@ -1039,11 +1122,16 @@ public class TTTree<T extends IData<T>> {
                             a.setParent(b.getMyPosition());
                         }
                         if (a != null) {
+                            editedNodes.add(a);
                             writeNode(a);
                         }
+                        editedNodes.add(b);
                         writeNode(b);
-                        if (c != null)
+                        if (c != null) {
+                            editedNodes.add(c);
                             writeNode(c);
+                        }
+                        editedNodes.add(parent);
                         writeNode(parent);
                     }
                     //parent.setRightSon(null);
@@ -1072,9 +1160,14 @@ public class TTTree<T extends IData<T>> {
                             c = getFromAddress(inOrderLeaf.getLeftSon());
                             c.setParent(inOrderLeaf.getMyPosition());
                         }
+                        editedNodes.add(a);
                         writeNode(a);
-                        if (c != null)
+                        if (c != null) {
+                            editedNodes.add(c);
                             writeNode(c);
+                        }
+                        editedNodes.add(parent);
+                        editedNodes.add(inOrderLeaf);
                         writeNode(parent);
                         writeNode(inOrderLeaf);
                         return true;
@@ -1093,9 +1186,14 @@ public class TTTree<T extends IData<T>> {
                             d = getFromAddress(inOrderLeaf.getRightSon());
                             d.setParent(inOrderLeaf.getMyPosition());
                         }
+                        editedNodes.add(b);
                         writeNode(b);
-                        if (d != null)
+                        if (d != null) {
+                            editedNodes.add(d);
                             writeNode(d);
+                        }
+                        editedNodes.add(parent);
+                        editedNodes.add(inOrderLeaf);
                         writeNode(parent);
                         writeNode(inOrderLeaf);
                         return true;
@@ -1124,10 +1222,15 @@ public class TTTree<T extends IData<T>> {
                     parent.setMiddleSon(-1);
 
                     parent.setDataR(parent.getDataL().createClass());
+                    editedNodes.add(a);
+                    editedNodes.add(b);
                     writeNode(a);
                     writeNode(b);
-                    if (c != null)
+                    if (c != null) {
+                        editedNodes.add(c);
                         writeNode(c);
+                    }
+                    editedNodes.add(parent);
                     writeNode(parent);
                 }
             }

@@ -237,6 +237,7 @@ public class TestGenerator {
                             this.treeToConsole();
                             this.dataInFileToConsole();
                             this.emptyPositionsToConsole();
+                            this.emptyPositionsTreeToConsole();
                             this.testArrayToConsole();
                             //System.out.println("root: " + testTree.getRoot());
                         }
@@ -266,6 +267,7 @@ public class TestGenerator {
                                     this.treeToConsole();
                                     this.dataInFileToConsole();
                                     this.emptyPositionsToConsole();
+                                    this.emptyPositionsTreeToConsole();
                                     this.testArrayToConsole();
                                     break;
                                 }
@@ -399,6 +401,14 @@ public class TestGenerator {
         Collections.sort(testArrayList);
         for (Integer tempI : testArrayList) {
             System.out.println(tempI);
+        }
+    }
+
+    public void emptyPositionsTreeToConsole() {
+        System.out.println("---------TREE-EMPTY-POSITIONS----------");
+        ArrayList<EmptyPosition> arrayList = testTree.getAllEmptyPositions();
+        for (EmptyPosition e : arrayList) {
+            System.out.println(e.getPosition());
         }
     }
 
