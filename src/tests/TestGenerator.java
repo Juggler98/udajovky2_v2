@@ -184,7 +184,7 @@ public class TestGenerator {
     }
 
     public void runTestsTree() {
-        int testCount = 500;
+        int testCount = 1;
         for (int j = 0; j < testCount; j++) {
             dataFile.clearData();
             System.out.println("--------------------------NEW-TEST-------------------------------------");

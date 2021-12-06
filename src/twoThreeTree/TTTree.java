@@ -1,5 +1,6 @@
 package twoThreeTree;
 
+import data.EmptyPosition;
 import models.IData;
 
 import java.io.RandomAccessFile;
@@ -11,13 +12,17 @@ public class TTTree<T extends IData<T>> {
     private int height = 0;
 
     private final RandomAccessFile file;
-    private TTTreeNode<T> node;
+    private final RandomAccessFile emptyPositions;
+    private final TTTreeNode<T> node;
     private final long startAddress = 16;
+
+    ArrayList<TTTreeNode<T>> editedNodes = new ArrayList<>();
 
     public TTTree(String filename, TTTreeNode<T> node) {
         try {
             file = new RandomAccessFile(filename + ".txt", "rw");
-            file.setLength(0); // TODO: Remove it
+            emptyPositions = new RandomAccessFile(filename + "EmptyPositions.txt", "rw");
+            this.clearData(); // TODO: Remove it
             this.node = node;
             if (file.length() == 0) {
                 writeInfoData(-1);
@@ -27,6 +32,33 @@ public class TTTree<T extends IData<T>> {
                 file.seek(12);
                 height = file.readInt();
             }
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public void clearData() {
+        try {
+            file.setLength(0);
+            emptyPositions.setLength(0);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public ArrayList<EmptyPosition> getAllEmptyPositions() {
+        EmptyPosition data = new EmptyPosition();
+        ArrayList<EmptyPosition> list = new ArrayList<>();
+        try {
+            byte[] b = new byte[data.getSize()];
+            emptyPositions.seek(0);
+            while (emptyPositions.read(b) != -1) {
+                EmptyPosition newData = new EmptyPosition();
+                newData.fromByteArray(b);
+                list.add(newData);
+                emptyPositions.seek(emptyPositions.getFilePointer());
+            }
+            return list;
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -71,6 +103,8 @@ public class TTTree<T extends IData<T>> {
 
     private long getEmptyPosition() {
         try {
+
+
             return file.length();
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -502,43 +536,6 @@ public class TTTree<T extends IData<T>> {
         return data;
     }
 
-//    public ArrayList<T> getData() {
-//        return data;
-//    }
-
-//    public void clearData() {
-//        data.clear();
-//    }
-
-//    public void setInterval(TTTreeNode<K, T> node, K start, K end) {
-//        if (node == null) {
-//            return;
-//        }
-//        if (start.compareTo(node.getDataL().getKey()) < 0 || end.compareTo(node.getDataL().getKey()) < 0) {
-//            setInterval(node.getLeftSon(), start, end);
-//        }
-//        if (node.getDataL().getKey().compareTo(start) >= 0 && node.getDataL().getKey().compareTo(end) <= 0) {
-//            data.add(node.getDataL());
-//        }
-//        if (node.isThreeNode()) {
-//            if (node.getDataR().getKey().compareTo(start) >= 0 && node.getDataR().getKey().compareTo(end) <= 0) {
-//                data.add(node.getDataR());
-//            }
-//        }
-//        if (node.isThreeNode()) {
-//            if (!((start.compareTo(node.getDataL().getKey()) < 0 && end.compareTo(node.getDataR().getKey()) < 0) || (start.compareTo(node.getDataL().getKey()) > 0 && end.compareTo(node.getDataR().getKey()) > 0))) {
-//                setInterval(node.getMiddleSon(), start, end);
-//            }
-//            if (start.compareTo(node.getDataR().getKey()) > 0 || end.compareTo(node.getDataR().getKey()) > 0) {
-//                setInterval(node.getRightSon(), start, end);
-//            }
-//        } else {
-//            if (start.compareTo(node.getDataL().getKey()) > 0 || end.compareTo(node.getDataL().getKey()) > 0) {
-//                setInterval(node.getRightSon(), start, end);
-//            }
-//        }
-//    }
-
     /*
     Len pre testove ucely.
      */
@@ -702,96 +699,11 @@ public class TTTree<T extends IData<T>> {
         return data.compareTo(result.getDataL()) == 0 ? result : null;
     }
 
-    private TTTreeNode<T> searchNodeWithData(T data) {
-        TTTreeNode<T> result = getRoot();
-        if (result == null) {
-            return null;
-        }
-        while (data.compareTo(result.getDataL()) != 0) {
-            if (result.hasDataR() && data.compareTo(result.getDataR()) == 0) {
-                break;
-            }
-            if (result.isThreeNode()) {
-                if (data.compareTo(result.getDataL()) < 0) {
-                    if (result.hasLeftSon())
-                        result = getFromAddress(result.getLeftSon());
-                    else
-                        break;
-                } else if (data.compareTo(result.getDataR()) > 0) {
-                    if (result.hasRightSon())
-                        result = getFromAddress(result.getRightSon());
-                    else
-                        break;
-                } else {
-                    if (result.hasMiddleSon())
-                        result = getFromAddress(result.getMiddleSon());
-                    else
-                        break;
-                }
-            } else {
-                if (data.compareTo(result.getDataL()) < 0) {
-                    if (result.hasLeftSon())
-                        result = getFromAddress(result.getLeftSon());
-                    else
-                        break;
-                } else {
-                    if (result.hasRightSon())
-                        result = getFromAddress(result.getRightSon());
-                    else
-                        break;
-                }
-            }
-        }
-        if (result.isThreeNode()) {
-            return (data.compareTo(result.getDataL()) == 0 || data.compareTo(result.getDataR()) == 0) ? result : null;
-        }
-        return data.compareTo(result.getDataL()) == 0 ? result : null;
-    }
-
-    //public TTTreeNode<K, T> getRoot() {
-    //return root;
-    //}
-
-    //public int getSize() {
-    //return size;
-    //}
-
-    //    public dvaTriStrom.TreeNode search(dvaTriStrom.TreeNode node) {
-//        return null;
-//    }
-
     /*
         Implementovane podla slovneho popisu z prednaskoveho dokumentu.
     */
     public T remove(T data) {
         TTTreeNode<T> node = searchNode(data);
-        if (node == null) {
-            System.out.println("Mazanie, prvok neexistuje: " + data);
-            return null;
-        }
-        T deletedData;
-        boolean left;
-        if (data.compareTo(node.getDataL()) == 0) {
-            deletedData = node.getDataL();
-            left = true;
-        } else {
-            deletedData = node.getDataR();
-            left = false;
-        }
-        if (!tryToRemove(node, left)) {
-            System.out.println("Mazanie sa nepodarilo, kluc: " + deletedData);
-            return null;
-        }
-        size--;
-        writeInfoData();
-        return deletedData;
-    }
-
-    /*
-    Metoda removeData maze prvok rovnako ako metoda remove, ale mazany prvok hlada pomocou dat T a nie len podla kluca K.
-     */
-    public T removeData(T data) {
-        TTTreeNode<T> node = searchNodeWithData(data);
         if (node == null) {
             System.out.println("Mazanie, prvok neexistuje: " + data);
             return null;
@@ -828,16 +740,7 @@ public class TTTree<T extends IData<T>> {
                     writeInfoData(-1);
                     return true;
                 } else {
-//                    if (node.getParent().getMiddleSon() == node) {
-//                        node.getParent().setMiddleSon(null);
-//                    } else if (node.getParent().getLeftSon() == node) {
-//                        node.getParent().setLeftSon(null);
-//                    } else {
-//                        node.getParent().setRightSon(null);
-//                    }
                     node.setDataL(node.getDataL().createClass());
-                    //return node.getDataL();
-                    //node.setParent(null);
                     writeNode(node);
                 }
             } else {
@@ -923,24 +826,6 @@ public class TTTree<T extends IData<T>> {
                     writeNode(root);
                     writeInfoData(root.getMyPosition());
                 }
-//                if (inOrderLeaf.hasMiddleSon() && inOrderLeaf.getMiddleSon().hasKeyL()) {
-//                    root = inOrderLeaf.getMiddleSon();
-//                }
-//                if (inOrderLeaf.hasRightSon() && inOrderLeaf.getRightSon().hasKeyL()) {
-//                    root = inOrderLeaf.getRightSon();
-//                }
-//                if (!inOrderLeaf.hasLeftSon() && !inOrderLeaf.hasMiddleSon() && !inOrderLeaf.hasRightSon()) {
-//                    root = null;
-//                }
-//                if (inOrderLeaf.hasLeftSon() && inOrderLeaf.hasRightSon()) {
-//                    System.out.println("Possible error: inOrderLeaf.hasLeftSon() && inOrderLeaf.hasRightSon()");
-//                }
-//                if (inOrderLeaf.hasLeftSon() && inOrderLeaf.hasMiddleSon()) {
-//                    System.out.println("Possible error: inOrderLeaf.hasLeftSon() && inOrderLeaf.hasMiddleSon()");
-//                }
-//                if (inOrderLeaf.hasRightSon() && inOrderLeaf.hasMiddleSon()) {
-//                    System.out.println("Possible error: inOrderLeaf.hasRightSon() && inOrderLeaf.hasMiddleSon()");
-//                }
                 height--;
                 return true;
             }
