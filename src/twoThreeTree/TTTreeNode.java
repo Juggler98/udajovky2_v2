@@ -212,7 +212,7 @@ public class TTTreeNode<T extends IData<T>> implements IData {
     }
 
     public boolean hasDataL() {
-        return this.dataL != null;
+        return this.dataL.isValid();
     }
 
     public boolean hasDataR() {

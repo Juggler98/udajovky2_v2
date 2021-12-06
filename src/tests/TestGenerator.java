@@ -12,11 +12,12 @@ import java.util.Random;
 
 public class TestGenerator {
 
-    DataFile<TestClass> dataFile = new DataFile<>("0TestClass", new TestClass());
-    TTTree<TestClassIndex> testTree;
-    Random randomValue = new Random();
-    Random randomForOperation = new Random();
-    Random randomSeed = new Random();
+    private DataFile<TestClass> dataFile = new DataFile<>("0TestClass", new TestClass());
+    private TTTree<TestClassIndex> testTree;
+    private ArrayList<Integer> testArrayList;
+    private Random randomValue = new Random();
+    private Random randomForOperation = new Random();
+    private Random randomSeed = new Random();
 
     public TestGenerator() {
     }
@@ -31,8 +32,8 @@ public class TestGenerator {
             int removeCount = 0;
             int addNotPossible = 0;
             int removeNotPossible = 0;
-            int randomValueSeed = randomSeed.nextInt(10000000);
-            int randomForOperationSeed = randomSeed.nextInt(10000000);
+            int randomValueSeed = randomSeed.nextInt(100000000);
+            int randomForOperationSeed = randomSeed.nextInt(100000000);
             randomValue.setSeed(randomValueSeed);
             randomForOperation.setSeed(randomForOperationSeed);
             ArrayList<Integer> testArrayList = new ArrayList<>();
@@ -183,21 +184,21 @@ public class TestGenerator {
     }
 
     public void runTestsTree() {
-        int testCount = 1;
+        int testCount = 500;
         for (int j = 0; j < testCount; j++) {
             dataFile.clearData();
             System.out.println("--------------------------NEW-TEST-------------------------------------");
-            int operationCount = 10;
+            int operationCount = 100;
             int addCount = 0;
             int removeCount = 0;
             int addNotPossible = 0;
             int removeNotPossible = 0;
-            int randomValueSeed = randomSeed.nextInt(10000000);
-            int randomForOperationSeed = randomSeed.nextInt(10000000);
+            int randomValueSeed = randomSeed.nextInt(100000000);
+            int randomForOperationSeed = randomSeed.nextInt(100000000);
             System.out.println("RandomValueSeed: " + randomValueSeed + " RandomForOperationSeed: " + randomForOperationSeed);
-            randomValue.setSeed(2889700);
-            randomForOperation.setSeed(1236486);
-            ArrayList<Integer> testArrayList = new ArrayList<>();
+            randomValue.setSeed(randomValueSeed);
+            randomForOperation.setSeed(randomForOperationSeed);
+            testArrayList = new ArrayList<>();
             testTree = new TTTree<>("0testingTree", new TTTreeNode<>(new TestClassIndex()));
             ArrayList<TestClass> testClasses = new ArrayList<>();
 
@@ -217,13 +218,14 @@ public class TestGenerator {
                     if (i % 10000 == 0) {
                         System.out.println(i + " operation");
                     }
+                    System.out.printf("------------------OPERATION-%d------------------\n", i);
                     TestClass testClass = new TestClass(randomValue.nextInt(randomNumberBound), "nothing");
                     int randomOperation = randomForOperation.nextInt(100);
                     if (randomOperation < addPercentage) {
                         System.out.println("ADD: " + testClass.getValue());
                         addCount++;
                         boolean arrayListNotAdd = !testArrayList.contains(testClass.getValue());
-                        boolean treeNotAdd = true;
+                        boolean treeNotAdd = false;
                         if (arrayListNotAdd) {
                             testArrayList.add(testClass.getValue());
                             testClasses.add(testClass);
@@ -233,14 +235,18 @@ public class TestGenerator {
                                 addNotPossible++;
                             }
                             this.treeToConsole();
+                            this.dataInFileToConsole();
+                            this.emptyPositionsToConsole();
+                            this.testArrayToConsole();
                             //System.out.println("root: " + testTree.getRoot());
                         }
-                        if (treeNotAdd && !arrayListNotAdd) {
+                        if (!treeNotAdd && arrayListNotAdd) {
                             System.out.println(testClass.getValue());
                             System.out.println("-------Test-Problem------");
                             System.out.println(randomValueSeed);
                             System.out.println(randomForOperationSeed);
-                            break;
+                            throw new IllegalStateException("treeNotAdd && !arrayListNotAdd");
+                            //break;
                         }
                     } else {
                         if (testTree.getSize() > 0) {
@@ -257,6 +263,10 @@ public class TestGenerator {
                                     testClasses.remove(deleteIndex);
                                     testClassIndex = testTree.remove(testClassIndex);
                                     dataFile.delete(testClassIndex.getDataPosition());
+                                    this.treeToConsole();
+                                    this.dataInFileToConsole();
+                                    this.emptyPositionsToConsole();
+                                    this.testArrayToConsole();
                                     break;
                                 }
                             }
@@ -264,12 +274,6 @@ public class TestGenerator {
                             System.out.println("Empty tree");
                         }
                     }
-                }
-
-                System.out.println("---------NUMBERS-IN-ARRAYLIST----------");
-                Collections.sort(testArrayList);
-                for (Integer i : testArrayList) {
-                    System.out.println(i);
                 }
             } else {
                 TestClassIndex t = new TestClassIndex(testNumbers[0].getValue(), dataFile.write(testNumbers[0]));
@@ -326,7 +330,9 @@ public class TestGenerator {
             System.out.println("ArrayList size " + testArrayList.size());
             System.out.println("Tree height: " + testTree.getHeight());
 
-            System.out.println("Inorder vsetky hodnoty:");
+            this.testArrayToConsole();
+
+            System.out.println("Inorder vsetky hodnoty stromu:");
             ArrayList<TestClassIndex> hodnoty = testTree.getInOrderData();
             for (TestClassIndex testClass : hodnoty) {
                 System.out.println(testClass.getValue());
@@ -356,7 +362,8 @@ public class TestGenerator {
             } else {
                 System.out.println("CHYBA!!! Data v strome neobsahuju alebo neodkazuju na spravne data v subore.");
                 System.out.println("RandomValueSeed: " + randomValueSeed + " RandomForOperationSeed: " + randomForOperationSeed);
-                break;
+                throw new IllegalStateException("CHYBA!!! Data v strome neobsahuju alebo neodkazuju na spravne data v subore.");
+                //break;
             }
 
         }
@@ -386,6 +393,17 @@ public class TestGenerator {
             System.out.println(node);
         }
     }
+
+    public void testArrayToConsole() {
+        System.out.println("---------NUMBERS-IN-ARRAYLIST----------");
+        Collections.sort(testArrayList);
+        for (Integer tempI : testArrayList) {
+            System.out.println(tempI);
+        }
+    }
+
+
+
 
 
 }
