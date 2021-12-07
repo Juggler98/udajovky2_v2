@@ -1,34 +1,41 @@
 package models;
 
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
-public class PCRTestCode implements IData<PCRTestCode>  {
+public class OsobaIndex implements IData<OsobaIndex> {
 
     private long dataPosition;
-    private String testCode;
+    private String rodCislo;
     private boolean valid = true;
-
     private static final char emptyChar = '*';
-    private static final int KOD_LENGTH = 36;
+    private static final int RODCISLO_LENGTH = 10;
 
-    public PCRTestCode(String kodTestu, long dataPosition) {
+    public OsobaIndex(String rodCislo, long dataPosition) {
+        this.rodCislo = rodCislo;
         this.dataPosition = dataPosition;
-        this.testCode = kodTestu;
     }
 
-    public PCRTestCode(String kodTestu) {
-        this.testCode = kodTestu;
+    public OsobaIndex(String rodCislo) {
+        this.rodCislo = rodCislo;
         this.dataPosition = -1;
     }
 
-    public PCRTestCode() {
-        testCode = "";
+    public OsobaIndex() {
+        rodCislo = "";
         valid = false;
         dataPosition = -1;
+    }
+
+    @Override
+    public int compareTo(OsobaIndex o) {
+        return rodCislo.compareTo(o.rodCislo);
+    }
+
+    public String getRodCislo() {
+        return rodCislo;
     }
 
     public long getDataPosition() {
@@ -36,27 +43,22 @@ public class PCRTestCode implements IData<PCRTestCode>  {
     }
 
     @Override
-    public int compareTo(PCRTestCode o) {
-        return testCode.compareTo(o.testCode);
-    }
-
-    @Override
     public byte[] toByteArray() {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
         try {
-            String kodTestu = this.testCode;
-            if (kodTestu.length() <= KOD_LENGTH) {
-                StringBuilder stringBuilder = new StringBuilder(kodTestu);
-                for (int i = kodTestu.length(); i < KOD_LENGTH; i++)
+            String rodCislo = this.rodCislo;
+            if (rodCislo.length() <= RODCISLO_LENGTH) {
+                StringBuilder stringBuilder = new StringBuilder(rodCislo);
+                for (int i = rodCislo.length(); i < RODCISLO_LENGTH; i++)
                     stringBuilder.append(emptyChar);
-                kodTestu = stringBuilder.toString();
+                rodCislo = stringBuilder.toString();
             } else {
-                kodTestu = kodTestu.substring(0, KOD_LENGTH);
+                rodCislo = rodCislo.substring(0, RODCISLO_LENGTH);
             }
 
-            dataOutputStream.writeLong(dataPosition);
-            dataOutputStream.writeChars(kodTestu);
+            dataOutputStream.writeLong(this.dataPosition);
+            dataOutputStream.writeChars(rodCislo);
             dataOutputStream.writeBoolean(valid);
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
@@ -72,9 +74,13 @@ public class PCRTestCode implements IData<PCRTestCode>  {
             dataPosition = dataInputStream.readLong();
 
             StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < KOD_LENGTH; i++)
-                stringBuilder.append(dataInputStream.readChar());
-            testCode = stringBuilder.toString();
+            for (int i = 0; i < RODCISLO_LENGTH; i++) {
+                char c = dataInputStream.readChar();
+                if (c != emptyChar) {
+                    stringBuilder.append(c);
+                }
+            }
+            rodCislo = stringBuilder.toString();
 
             valid = dataInputStream.readBoolean();
         } catch (Exception e) {
@@ -84,7 +90,7 @@ public class PCRTestCode implements IData<PCRTestCode>  {
 
     @Override
     public int getSize() {
-        return Long.BYTES + 1 + KOD_LENGTH * Character.BYTES;
+        return Long.BYTES + 1 + RODCISLO_LENGTH * Character.BYTES;
     }
 
     @Override
@@ -94,19 +100,19 @@ public class PCRTestCode implements IData<PCRTestCode>  {
 
     @Override
     public boolean isValid() {
-        return valid;
+        return this.valid;
     }
 
     @Override
-    public PCRTestCode createClass() {
-        return new PCRTestCode();
+    public OsobaIndex createClass() {
+        return new OsobaIndex();
     }
 
     @Override
     public String toString() {
-        return "PCRTestCode{" +
-                "data=" + dataPosition +
-                ", kodTestu='" + testCode + '\'' +
+        return "OsobaIndex{" +
+                "dataPosition=" + dataPosition +
+                ", rodCislo='" + rodCislo + '\'' +
                 ", valid=" + valid +
                 '}';
     }

@@ -8,12 +8,10 @@ public class Main {
     public static void main(String[] args) {
 
         TestGenerator testGenerator = new TestGenerator();
-        testGenerator.runTestsTree();
+        //testGenerator.runTests();
+        //testGenerator.runTestsTree();
 
-
-
-
-        //new GraphicalApp();
+        new GraphicalApp();
 
     }
 

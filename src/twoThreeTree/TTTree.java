@@ -22,7 +22,7 @@ public class TTTree<T extends IData<T>> {
         try {
             file = new RandomAccessFile(filename + ".txt", "rw");
             emptyPositions = new RandomAccessFile(filename + "EmptyPositions.txt", "rw");
-            this.clearData(); // TODO: Remove it
+            //this.clearData(); // TODO: Remove it
             this.node = node;
             if (file.length() == 0) {
                 writeInfoData(-1);
@@ -104,7 +104,7 @@ public class TTTree<T extends IData<T>> {
     private long getEmptyPosition() {
         try {
             if (emptyPositions.length() == 0) {
-                System.out.println("No empty positions, write to: " + file.length());
+                //System.out.println("No empty positions, write to: " + file.length());
                 return file.length();
             }
             EmptyPosition emptyPosition = new EmptyPosition();
@@ -135,7 +135,7 @@ public class TTTree<T extends IData<T>> {
                 }
             }
 
-            System.out.println("write to Empty position: " + emptyPosition.getPosition());
+            //System.out.println("write to Empty position: " + emptyPosition.getPosition());
             return emptyPosition.getPosition();
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -196,6 +196,22 @@ public class TTTree<T extends IData<T>> {
             System.out.print(file.readInt() + " ");
             file.seek(12);
             System.out.println(file.readInt());
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+
+    }
+
+    public String getInfo() {
+        try {
+            String info = "rootPosition, size, height: ";
+            file.seek(0);
+            info += file.readLong() + " ";
+            file.seek(8);
+            info += file.readInt() + " ";
+            file.seek(12);
+            info += file.readInt();
+            return info;
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

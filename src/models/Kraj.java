@@ -6,4 +6,12 @@ public class Kraj extends UzemnaJednotka {
         super(kod, nazov);
     }
 
+    public Kraj() {
+
+    }
+
+    @Override
+    public UzemnaJednotka createClass() {
+        return new Kraj();
+    }
 }

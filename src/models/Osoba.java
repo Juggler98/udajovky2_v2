@@ -16,6 +16,7 @@ public class Osoba implements IData<Osoba> {
     private final Date datumNarodenia;
     private String rodCislo = "";
     private TTTree<PCRTestDate> testy;
+    private long myPosition;
     private boolean valid = true;
     private final char emptyChar = '*';
     private static final int MENO_LENGTH = 15;
@@ -23,15 +24,6 @@ public class Osoba implements IData<Osoba> {
     private static final int RODCISLO_LENGTH = 10;
 
     public Osoba(String meno, String priezvisko, Date datumNarodenia, String rodCislo) {
-        if (meno.length() > MENO_LENGTH) {
-            meno = meno.substring(0, MENO_LENGTH - 1);
-        }
-        if (priezvisko.length() > PRIEZVISKO_LENGTH) {
-            priezvisko = priezvisko.substring(0, PRIEZVISKO_LENGTH - 1);
-        }
-        if (rodCislo.length() > RODCISLO_LENGTH) {
-            rodCislo = rodCislo.substring(0, RODCISLO_LENGTH - 1);
-        }
         this.meno = meno;
         this.priezvisko = priezvisko;
         this.rodCislo = rodCislo;
@@ -40,22 +32,19 @@ public class Osoba implements IData<Osoba> {
     }
 
     public Osoba() {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < MENO_LENGTH; i++)
-            stringBuilder.append(emptyChar);
-        meno = stringBuilder.toString();
+        meno = "";
+        priezvisko = "";
+        rodCislo = "";
+        valid = false;
+        datumNarodenia = new Date();
+    }
 
-        stringBuilder = new StringBuilder();
-        for (int i = 0; i < PRIEZVISKO_LENGTH; i++)
-            stringBuilder.append(emptyChar);
-        priezvisko = stringBuilder.toString();
+    public long getMyPosition() {
+        return myPosition;
+    }
 
-        stringBuilder = new StringBuilder();
-        for (int i = 0; i < RODCISLO_LENGTH; i++)
-            stringBuilder.append(emptyChar);
-        rodCislo = stringBuilder.toString();
-
-        datumNarodenia = new Date(System.currentTimeMillis());
+    public void setMyPosition(long myPosition) {
+        this.myPosition = myPosition;
     }
 
     public TTTree<PCRTestDate> getTesty() {
@@ -89,26 +78,32 @@ public class Osoba implements IData<Osoba> {
         DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
         try {
             String meno = this.meno;
-            if (meno.length() < MENO_LENGTH) {
+            if (meno.length() <= MENO_LENGTH) {
                 StringBuilder stringBuilder = new StringBuilder(meno);
                 for (int i = meno.length(); i < MENO_LENGTH; i++)
                     stringBuilder.append(emptyChar);
                 meno = stringBuilder.toString();
+            } else {
+                meno = meno.substring(0, MENO_LENGTH);
             }
             String priezvisko = this.priezvisko;
-            if (priezvisko.length() < PRIEZVISKO_LENGTH) {
+            if (priezvisko.length() <= PRIEZVISKO_LENGTH) {
                 StringBuilder stringBuilder = new StringBuilder(priezvisko);
                 for (int i = priezvisko.length(); i < PRIEZVISKO_LENGTH; i++)
                     stringBuilder.append(emptyChar);
                 priezvisko = stringBuilder.toString();
+            } else {
+                priezvisko = priezvisko.substring(0, PRIEZVISKO_LENGTH);
             }
 
             String rodCislo = this.rodCislo;
-            if (rodCislo.length() < RODCISLO_LENGTH) {
+            if (rodCislo.length() <= RODCISLO_LENGTH) {
                 StringBuilder stringBuilder = new StringBuilder(rodCislo);
                 for (int i = rodCislo.length(); i < RODCISLO_LENGTH; i++)
                     stringBuilder.append(emptyChar);
                 rodCislo = stringBuilder.toString();
+            } else {
+                rodCislo = rodCislo.substring(0, RODCISLO_LENGTH);
             }
 
             dataOutputStream.writeChars(meno);
@@ -128,22 +123,38 @@ public class Osoba implements IData<Osoba> {
         DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
         try {
             StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < MENO_LENGTH; i++)
-                stringBuilder.append(dataInputStream.readChar());
+            for (int i = 0; i < MENO_LENGTH; i++) {
+                char c = dataInputStream.readChar();
+                if (c != emptyChar) {
+                    stringBuilder.append(c);
+                }
+            }
             meno = stringBuilder.toString();
 
             stringBuilder = new StringBuilder();
-            for (int i = 0; i < PRIEZVISKO_LENGTH; i++)
-                stringBuilder.append(dataInputStream.readChar());
+            for (int i = 0; i < PRIEZVISKO_LENGTH; i++) {
+                char c = dataInputStream.readChar();
+                if (c != emptyChar) {
+                    stringBuilder.append(c);
+                }
+            }
             priezvisko = stringBuilder.toString();
 
             stringBuilder = new StringBuilder();
-            for (int i = 0; i < RODCISLO_LENGTH; i++)
-                stringBuilder.append(dataInputStream.readChar());
+            for (int i = 0; i < RODCISLO_LENGTH; i++) {
+                char c = dataInputStream.readChar();
+                if (c != emptyChar) {
+                    stringBuilder.append(c);
+                }
+            }
             rodCislo = stringBuilder.toString();
 
             datumNarodenia.setTime(dataInputStream.readLong());
             valid = dataInputStream.readBoolean();
+
+            if (valid) {
+                testy = new TTTree<>(rodCislo, new TTTreeNode<>(new PCRTestDate()));
+            }
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -167,5 +178,17 @@ public class Osoba implements IData<Osoba> {
     @Override
     public Osoba createClass() {
         return new Osoba();
+    }
+
+    @Override
+    public String toString() {
+        return "Osoba{" +
+                "meno='" + meno + '\'' +
+                ", priezvisko='" + priezvisko + '\'' +
+                ", datumNarodenia=" + datumNarodenia +
+                ", rodCislo='" + rodCislo + '\'' +
+                ", testy=" + testy +
+                ", valid=" + valid +
+                '}';
     }
 }

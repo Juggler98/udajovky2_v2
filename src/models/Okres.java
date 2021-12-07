@@ -13,6 +13,11 @@ public class Okres extends UzemnaJednotka {
 
     }
 
+    @Override
+    public UzemnaJednotka createClass() {
+        return new Okres();
+    }
+
     public int getKodKraja() {
         return kodKraja;
     }

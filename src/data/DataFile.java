@@ -15,6 +15,7 @@ public class DataFile<T extends IData<T>> {
         try {
             file = new RandomAccessFile(filename + ".txt", "rw");
             emptyPositions = new RandomAccessFile(filename + "EmptyPositions.txt", "rw");
+            //clearData(); // TODO: REMOVE IT
             this.data = data;
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -35,10 +36,10 @@ public class DataFile<T extends IData<T>> {
             long writePosition;
             if (emptyPositions.length() > 0) {
                 writePosition = getEmptyPosition();
-                System.out.println("emptyPosition: " + writePosition);
+                //System.out.println("emptyPosition: " + writePosition);
             } else {
                 writePosition = file.length();
-                System.out.println("newPosition: " + writePosition);
+                //System.out.println("newPosition: " + writePosition);
             }
             file.seek(writePosition);
             file.write(data.toByteArray());

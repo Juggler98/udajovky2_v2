@@ -8,6 +8,10 @@ public class KrajPocetPozitivnych extends UzemnaJednotka {
         super(kod, nazov);
     }
 
+    public KrajPocetPozitivnych() {
+
+    }
+
     @Override
     public int compareTo(UzemnaJednotka u) {
         KrajPocetPozitivnych krajPocetPozitivnych = (KrajPocetPozitivnych) u;
@@ -15,6 +19,11 @@ public class KrajPocetPozitivnych extends UzemnaJednotka {
             return this.getKod().compareTo(u.getKod());
         }
         return pocetPozitivnych.compareTo(krajPocetPozitivnych.pocetPozitivnych);
+    }
+
+    @Override
+    public UzemnaJednotka createClass() {
+        return new KrajPocetPozitivnych();
     }
 
     public Integer getPocetPozitivnych() {

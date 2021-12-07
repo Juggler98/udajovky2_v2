@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 public class GraphicalApp {
@@ -218,23 +219,22 @@ public class GraphicalApp {
     }
 
     private void addLoadButton() {
-//        JButton jButton = new JButton("Load");
-//        jPanel.add(jButton);
-//        jButton.setBounds(jFrameWidth - 120, jFrameHeight - 125 + 31, 80, 30);
-//
-//        jButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                String nazovSuboru = JOptionPane.showInputDialog("Zadaj nazov suboru");
-//                if (nazovSuboru != null) {
-//                    if (app.loadFromFile(nazovSuboru)) {
-//                        JOptionPane.showMessageDialog(null, "Data boli nacitane zo suboru: " + nazovSuboru + ".csv");
-//                    } else {
-//                        JOptionPane.showMessageDialog(null, "Data sa nepodarilo nacitat zo suboru: " + nazovSuboru + ".csv");
-//                    }
-//                }
-//            }
-//        });
+        JButton jButton = new JButton("Show");
+        jPanel.add(jButton);
+        jButton.setBounds(jFrameWidth - 120, jFrameHeight - 125 + 31, 80, 30);
+
+        jButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<String> arrayList = app.getInfo();
+                for (String s : arrayList) {
+                    jTextArea.append(s);
+                }
+                jTextArea.setCaretPosition(0);
+
+                jPanel.add(jScrollPane);
+            }
+        });
     }
 
     private void addVymazTest() {
@@ -274,7 +274,7 @@ public class GraphicalApp {
                         }
                         text += "\nOsoba:\n";
                         text += String.format("Rodne cislo: %s\n", test.getRodCisloPacienta());
-                        Osoba osoba = test.getOsoba();
+                        Osoba osoba = app.getOsoba(test.getOsobaPosition());
                         if (osoba != null) {
                             text += String.format("Meno: %s\n", osoba.getMeno());
                             text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());
@@ -421,7 +421,7 @@ public class GraphicalApp {
                         }
                         Date startDate = new Date(year - 1900, month - 1, day);
 
-                        TTTree<UzemnaJednotka> uzemneJednotky = new TTTree<>("okresPocetPozitivnych", new TTTreeNode<>(new Okres()));
+                        //TTTree<UzemnaJednotka> uzemneJednotky = new TTTree<>("okresPocetPozitivnych", new TTTreeNode<>(new OkresPocetPozitivnych()));
                         ArrayList<UzemnaJednotka> sortedUzemneJednotky = new ArrayList<>();
                         String text = "";
                         PCRTestDate t1 = new PCRTestDate(startDate);
@@ -431,7 +431,7 @@ public class GraphicalApp {
                                 Okres okres = app.getOkres(okresCode);
                                 OkresPocetPozitivnych okresPocetPozitivnych = new OkresPocetPozitivnych(okres.getKod(), okres.getNazov());
                                 okresPocetPozitivnych.setPocetPozitivnych(okres.getPozitivneTesty().getIntervalData(t1, t2).size());
-                                uzemneJednotky.add(okresPocetPozitivnych);
+                                sortedUzemneJednotky.add(okresPocetPozitivnych);
                             }
                             text = "Okresy\n";
                         } else if (typUzJednotkyZorad == TypUzJednotky.KRAJ) {
@@ -439,12 +439,12 @@ public class GraphicalApp {
                                 Kraj kraj = app.getKraj(krajeCodes);
                                 KrajPocetPozitivnych krajPocetPozitivnych = new KrajPocetPozitivnych(kraj.getKod(), kraj.getNazov());
                                 krajPocetPozitivnych.setPocetPozitivnych(kraj.getPozitivneTesty().getIntervalData(t1, t2).size());
-                                uzemneJednotky.add(krajPocetPozitivnych);
+                                sortedUzemneJednotky.add(krajPocetPozitivnych);
                             }
                             text = "Kraje\n";
                         }
 
-                        sortedUzemneJednotky = uzemneJednotky.getInOrderData();
+                        Collections.sort(sortedUzemneJednotky, (a, b) -> a.compareTo(b));
 
                         int index = 1;
                         if (sortedUzemneJednotky.size() == 0) {
@@ -617,14 +617,14 @@ public class GraphicalApp {
                         String text;
                         int index = 1;
                         for (PCRTestDate test : testy) {
-                            PCRTest t = app.getPCRTest(test.getData());
+                            PCRTest t = app.getPCRTest(test.getDataPosition());
                             text = "";
                             Okres okres = app.getOkres(t.getKodOkresu());
                             Pracovisko pracovisko = app.getPracovisko(t.getKodPracoviska());
                             text += "----------------------------------";
                             text += String.format("\nOsoba %d\n", index);
                             text += String.format("Rodne cislo: %s\n", t.getRodCisloPacienta());
-                            Osoba osoba = t.getOsoba();
+                            Osoba osoba = app.getOsoba(t.getOsobaPosition());
                             if (osoba != null) {
                                 text += String.format("Meno: %s\n", osoba.getMeno());
                                 text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());
@@ -811,7 +811,7 @@ public class GraphicalApp {
                     int index = 1;
                     String[] textArray = new String[testy.size()];
                     for (PCRTestDate test : testy) {
-                        PCRTest t = app.getPCRTest(test.getData());
+                        PCRTest t = app.getPCRTest(test.getDataPosition());
                         text = "";
                         Okres okres = app.getOkres(t.getKodOkresu());
                         Pracovisko pracovisko = app.getPracovisko(t.getKodPracoviska());
@@ -838,7 +838,7 @@ public class GraphicalApp {
                         }
                         text += "\nOsoba:\n";
                         text += String.format("Rodne cislo: %s\n", t.getRodCisloPacienta());
-                        Osoba osoba = t.getOsoba();
+                        Osoba osoba = app.getOsoba(t.getOsobaPosition());
                         if (osoba != null) {
                             text += String.format("Meno: %s\n", osoba.getMeno());
                             text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());
@@ -963,7 +963,7 @@ public class GraphicalApp {
                         String[] textArray = new String[testy.size() == 0 ? 1 : testy.size()];
                         textArray[0] = text;
                         for (PCRTestDate t : testy) {
-                            PCRTest test = app.getPCRTest(t.getData());
+                            PCRTest test = app.getPCRTest(t.getDataPosition());
                             Okres okres = app.getOkres(test.getKodOkresu());
                             Pracovisko pracovisko = app.getPracovisko(test.getKodPracoviska());
                             text += "----------------------------------";
@@ -1042,7 +1042,7 @@ public class GraphicalApp {
                         }
                         text += "\nOsoba:\n";
                         text += String.format("Rodne cislo: %s\n", test.getRodCisloPacienta());
-                        Osoba osoba = test.getOsoba();
+                        Osoba osoba = app.getOsoba(test.getOsobaPosition());
                         if (osoba != null) {
                             text += String.format("Meno: %s\n", osoba.getMeno());
                             text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());

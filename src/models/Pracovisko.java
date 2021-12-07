@@ -17,6 +17,11 @@ public class Pracovisko extends UzemnaJednotka {
         super(kod);
     }
 
+    @Override
+    public UzemnaJednotka createClass() {
+        return new Pracovisko();
+    }
+
     public int getKodKraja() {
         return kodKraja;
     }

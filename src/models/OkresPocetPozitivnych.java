@@ -8,6 +8,10 @@ public class OkresPocetPozitivnych extends UzemnaJednotka {
         super(kod, nazov);
     }
 
+    public OkresPocetPozitivnych() {
+
+    }
+
     @Override
     public int compareTo(UzemnaJednotka u) {
         OkresPocetPozitivnych okresPocetPozitivnych = (OkresPocetPozitivnych) u;
@@ -15,6 +19,11 @@ public class OkresPocetPozitivnych extends UzemnaJednotka {
             return this.getKod().compareTo(u.getKod());
         }
         return pocetPozitivnych.compareTo(okresPocetPozitivnych.pocetPozitivnych);
+    }
+
+    @Override
+    public UzemnaJednotka createClass() {
+        return new OkresPocetPozitivnych();
     }
 
     public Integer getPocetPozitivnych() {
@@ -25,4 +34,10 @@ public class OkresPocetPozitivnych extends UzemnaJednotka {
         this.pocetPozitivnych = pocetPozitivnych;
     }
 
+    @Override
+    public String toString() {
+        return "OkresPocetPozitivnych{" +
+                "pocetPozitivnych=" + pocetPozitivnych +
+                '}';
+    }
 }

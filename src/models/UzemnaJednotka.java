@@ -3,17 +3,24 @@ package models;
 import twoThreeTree.TTTree;
 import twoThreeTree.TTTreeNode;
 
-import java.util.Date;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 
 public abstract class UzemnaJednotka implements IData<UzemnaJednotka> {
 
     private Integer kod;
     private String nazov;
+    private boolean valid = true;
+
+    private static final char EMPTY_CHAR = '*';
+    private static final int NAME_LENGTH = 64;
 
     private TTTree<PCRTestDate> testy;
     private TTTree<PCRTestDate> pozitivneTesty;
 
-    UzemnaJednotka(int kod, String nazov) {
+    UzemnaJednotka(Integer kod, String nazov) {
         this.kod = kod;
         this.nazov = nazov;
         testy = new TTTree<>(nazov, new TTTreeNode<>(new PCRTestDate()));
@@ -21,40 +28,88 @@ public abstract class UzemnaJednotka implements IData<UzemnaJednotka> {
     }
 
     public UzemnaJednotka() {
-
+        nazov = "";
+        kod = -1;
+        valid = false;
     }
 
     public UzemnaJednotka(int kod) {
         this.kod = kod;
+        this.nazov = "";
     }
 
     @Override
     public byte[] toByteArray() {
-        return new byte[0];
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
+        try {
+            String nazov = this.nazov;
+            if (nazov.length() < NAME_LENGTH) {
+                StringBuilder stringBuilder = new StringBuilder(nazov);
+                for (int i = nazov.length(); i < NAME_LENGTH; i++)
+                    stringBuilder.append(EMPTY_CHAR);
+                nazov = stringBuilder.toString();
+            } else if (nazov.length() > NAME_LENGTH) {
+                nazov = nazov.substring(0, NAME_LENGTH);
+            }
+
+            dataOutputStream.writeChars(nazov);
+            dataOutputStream.writeInt(kod);
+            return byteArrayOutputStream.toByteArray();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public void fromByteArray(byte[] array) {
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(array);
+        DataInputStream dataInputStream = new DataInputStream(byteArrayInputStream);
+        try {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < NAME_LENGTH; i++) {
+                char c = dataInputStream.readChar();
+                if (c != EMPTY_CHAR) {
+                    stringBuilder.append(c);
+                }
+            }
+            this.nazov = stringBuilder.toString();
 
+            kod = dataInputStream.readInt();
+
+            if (kod == -1) {
+                valid = false;
+            } else {
+                valid = true;
+            }
+
+            if (valid) {
+                testy = new TTTree<>(nazov, new TTTreeNode<>(new PCRTestDate()));
+                pozitivneTesty = new TTTree<>(nazov + "Positive", new TTTreeNode<>(new PCRTestDate()));
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
     public int getSize() {
-        return 0;
+        return Integer.BYTES + NAME_LENGTH * Character.BYTES;
     }
 
     @Override
     public void setValid(boolean valid) {
-
+        this.valid = valid;
     }
 
     @Override
     public boolean isValid() {
-        return false;
+        return valid;
     }
 
     @Override
     public UzemnaJednotka createClass() {
+        System.out.println("null");
         return null;
     }
 
@@ -77,5 +132,15 @@ public abstract class UzemnaJednotka implements IData<UzemnaJednotka> {
 
     public String getNazov() {
         return nazov;
+    }
+
+    @Override
+    public String toString() {
+        return "UzemnaJednotka{" +
+                "kod=" + kod +
+                ", nazov='" + nazov + '\'' +
+                ", testy=" + testy +
+                ", pozitivneTesty=" + pozitivneTesty +
+                '}';
     }
 }

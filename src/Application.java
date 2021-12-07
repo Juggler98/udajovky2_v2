@@ -1,5 +1,6 @@
 import data.DataFile;
 import models.*;
+import tests.TestClassIndex;
 import twoThreeTree.TTTree;
 import twoThreeTree.TTTreeNode;
 
@@ -12,7 +13,7 @@ import java.util.*;
 
 public class Application {
 
-    private final TTTree<Osoba> personTree = new TTTree<>("personTree", new TTTreeNode<>(new Osoba()));
+    private final TTTree<OsobaIndex> personTree = new TTTree<>("personTree", new TTTreeNode<>(new OsobaIndex()));
     private final TTTree<PCRTestCode> pcrTreeCode = new TTTree<>("pcrTreeCode", new TTTreeNode<>(new PCRTestCode()));
     private final TTTree<PCRTestDate> pcrTreeDate = new TTTree<>("pcrTreeDate", new TTTreeNode<>(new PCRTestDate()));
     private final TTTree<PCRTestDate> pcrTreePositive = new TTTree<>("pcrTreePositive", new TTTreeNode<>( new PCRTestDate()));
@@ -21,7 +22,7 @@ public class Application {
     private final ArrayList<Osoba> randomOsoby = new ArrayList<>();
 
     private final DataFile<PCRTest> testDataFile = new DataFile<>("testDataFile", new PCRTest());
-    private final DataFile<Osoba> osobaDataFile = new DataFile<>("osobaDataFile", new Osoba());
+    private final DataFile<Osoba> osobaDataFile = new DataFile<>("0osobaDataFile", new Osoba());
 
     private final String[] names = {"Alexander", "Jett", "Griffin", "Tyson", "Donavan", "Remington", "German", "Frederick", "Camden", "Peter", "Gunnar", "Joey", "Leroy", "Braylon", "Darius", "Simeon", "Parker", "Colten", "Finnegan", "Esteban", "Nathaniel", "Marshall", "Hamza", "Mohammed", "Alden", "Kadin", "Will", "Orlando", "Lyric", "Shawn", "Ronald", "Brycen", "Kaleb", "Jaylan", "Keenan", "Bryant", "Eden", "Zaire", "Jarrett", "Gunner", "Dante", "Adonis", "Rex", "Giancarlo", "Grayson", "Alex", "Alfredo", "Ariel", "Cade", "Frank", "Craig", "Avery", "Rolando", "Daniel", "Nigel", "Malcolm", "Carmelo", "John", "Octavio", "Adrian", "Kash", "Shamar", "Alessandro", "Oliver", "Deangelo", "Kade", "Todd", "Spencer", "Trevin", "Jessie", "Santiago", "Theodore", "Damien", "Cayden", "Kelton", "Chance", "Jacob", "Jayvon", "Cael", "Zackary", "Javon", "Chandler", "Bentley", "Bronson", "Mekhi", "Emilio", "Hassan", "Micah", "Ronin", "Dennis", "Coby", "Rigoberto", "Morgan", "Oswaldo", "Brogan", "Wyatt", "Seamus", "Darian", "Titus", "Heath", "Marlene", "Miriam", "Kaylah", "Mylie", "Jaelyn", "Angeline", "Georgia", "Mia", "Rachael", "Zoie", "Emely", "Keira", "Cynthia", "Alena", "Mercedes", "Amara", "Carla", "Daisy", "Angie", "Lexie", "Reese", "Christine", "June", "Lila", "Angelina", "Sylvia", "Jacey", "Adalynn", "Alaina", "Dominique", "Rory", "Payten", "Casey", "Kira", "Noemi", "Fatima", "Alexandria", "Renee", "Jazmine", "Olive", "Cailyn", "Myah", "Evie", "Andrea", "Elizabeth", "Mariana", "Erika", "Kiersten", "Trinity", "Carissa", "Abagail", "Nicole", "Marlie", "Jewel", "Jasmine", "Kaia", "Mikayla", "Elise", "Leila", "Alia", "Alisha", "Kyla", "Juliet", "Paityn", "Isla", "Mareli", "Cristina", "Belinda", "Heidi", "Chana", "Shaniya", "Tania", "Isabela", "Avery", "Siena", "Amiya", "Madalyn", "Ryleigh", "Tara", "Jaylene", "Emery", "Jenna", "Jazlyn", "Shannon", "Brielle", "Reagan", "Averi", "Caitlin", "Abbey", "Aisha", "Cecelia", "Jocelynn", "Jordin", "Janiah", "Karissa", "Chelsea", "Kylie", "Eliana", "Sarah", "Kendall"};
     private final String[] lastNames = {"Giles", "Todd", "Wilkerson", "Meyer", "Padilla", "Buchanan", "Dillon", "Joseph", "Mullen", "Moss", "Finley", "Compton", "Fritz", "Freeman", "Solis", "Browning", "Ball", "Adkins", "Nunez", "Travis", "Gilmore", "Santiago", "Mayo", "Carson", "Bauer", "Brandt", "Yu", "Fleming", "Paul", "English", "Douglas", "Pacheco", "Carlson", "Mcintyre", "Sampson", "Oliver", "Tapia", "Galloway", "Bautista", "Mccormick", "Singleton", "Newman", "Gordon", "Davila", "Ramsey", "Brooks", "Colon", "Donaldson", "Farmer", "Mcguire", "Garza", "Villarreal", "Alexander", "Kennedy", "Cross", "Hall", "Charles", "Mcconnell", "Bass", "Daniels", "Bishop", "Odonnell", "Salinas", "Wise", "Ayala", "Koch", "Kirk", "Schwartz", "Lindsey", "Leon", "Werner", "Bowers", "Carr", "Mooney", "Norton", "Beck", "Mcknight", "Phelps", "Valencia", "Richards", "Gallegos", "Potter", "Brewer", "Martin", "Garrison", "Meza", "Herring", "Harding", "Wong", "Mata", "Booth", "Mason", "Frazier", "Hughes", "Montgomery", "Robertson", "Zamora", "Ryan", "Shields", "Maynard"};
@@ -50,15 +51,54 @@ public class Application {
         for (int i = 0; i < okresCodes.length; i++) {
             Okres okres = new Okres(okresCodes[i], okresCodes[i] / 100, okresNames[i]);
             okresTree.add(okres);
+            //System.out.println(okresTree.getRoot());
+            //System.out.println(okres);
         }
+        //System.out.println(okresTree.getSize());
+        //treeToConsole(okresTree);
         for (int i = 0; i < krajCodes.length; i++) {
             Kraj kraj = new Kraj(krajCodes[i], krajNames[i]);
             kraje[i] = kraj;
         }
         for (int i = 0; i < pracoviskaCodes.length; i++) {
             Pracovisko pracovisko = new Pracovisko(pracoviskaCodes[i], pracoviskaCodes[i] / 100, pracoviskaNames[i]);
-            //pracoviskoTree.add(pracovisko);
+            pracoviskoTree.add(pracovisko);
+            //System.out.println(pracovisko);
         }
+        //treeToConsole(pracoviskoTree);
+    }
+
+    public void treeToConsole(TTTree<?> tree) {
+        System.out.println("----------------TREE-FILE------------------");
+        tree.printInfo();
+        ArrayList<? extends TTTreeNode<?>> arrayList = tree.getAllData();
+        for (TTTreeNode<?> node : arrayList) {
+            System.out.println(node);
+        }
+    }
+
+    public ArrayList<String> getInfo() {
+        ArrayList<String> arrayList = new ArrayList<>();
+        ArrayList<TTTreeNode<PCRTestCode>> arrayList2 = pcrTreeCode.getAllData();
+        arrayList.add(pcrTreeCode.getInfo() + "\n");
+        for (TTTreeNode<PCRTestCode> node : arrayList2) {
+            arrayList.add(node.toString() + "\n");
+        }
+        ArrayList<PCRTest> arrayList3 = testDataFile.getAllData();
+        for (PCRTest test : arrayList3) {
+            arrayList.add(test.toString() + "\n");
+        }
+
+        arrayList.add(personTree.getInfo() + "\n");
+        ArrayList<TTTreeNode<OsobaIndex>> arrayList4 = personTree.getAllData();
+        for (TTTreeNode<OsobaIndex> node : arrayList4) {
+            arrayList.add(node.toString() + "\n");
+        }
+        ArrayList<Osoba> arrayList5 = osobaDataFile.getAllData();
+        for (Osoba osoba : arrayList5) {
+            arrayList.add(osoba.toString() + "\n");
+        }
+        return arrayList;
     }
 
     public void printPersonTree() {
@@ -106,22 +146,38 @@ public class Application {
     }
 
     public PCRTest getPCRTest(String kodTestu) {
-        PCRTestCode temp = new PCRTestCode(-1, kodTestu);
+        PCRTestCode temp = new PCRTestCode(kodTestu);
         PCRTestCode test = pcrTreeCode.search(temp);
+        if (test == null) {
+            return null;
+        }
         PCRTest p = new PCRTest();
-        p.fromByteArray(testDataFile.read(test.getData()));
-        return p == null ? null : p;
+        p.fromByteArray(testDataFile.read(test.getDataPosition()));
+        return p;
     }
 
     public PCRTest getPCRTest(long position) {
         PCRTest p = new PCRTest();
         p.fromByteArray(testDataFile.read(position));
-        return p == null ? null : p;
+        return p;
     }
 
     public Osoba getOsoba(String rodCislo) {
-        Osoba o = new Osoba("", "", null, rodCislo);
-        return personTree.search(o);
+        OsobaIndex temp = new OsobaIndex(rodCislo);
+        OsobaIndex osobaIndex = personTree.search(temp);
+        if (osobaIndex == null)
+            return null;
+        Osoba osoba = new Osoba();
+        osoba.setMyPosition(osobaIndex.getDataPosition());
+        osoba.fromByteArray(osobaDataFile.read(osobaIndex.getDataPosition()));
+        return osoba;
+    }
+
+    public Osoba getOsoba(long position) {
+        Osoba osoba = new Osoba();
+        osoba.setMyPosition(position);
+        osoba.fromByteArray(osobaDataFile.read(position));
+        return osoba;
     }
 
     public Pracovisko getPracovisko(int kodPracoviska) {
@@ -136,13 +192,7 @@ public class Application {
         return kraje[kodKraja - 1];
     }
 
-//    public ArrayList<Osoba> getIntervalOsoba(String startRodCislo, String endRodCislo) {
-//        personTree.clearData();
-//        personTree.setInterval((TTTreeNode<String, Osoba>) personTree.getRoot(), startRodCislo, endRodCislo);
-//        return personTree.getData();
-//    }
-
-    public ArrayList<Osoba> getVsetkyOsoba() {
+    public ArrayList<OsobaIndex> getVsetkyOsoba() {
         System.out.println(personTree.getSize());
         return personTree.getInOrderData();
     }
@@ -152,100 +202,16 @@ public class Application {
 //        return personTree.getIntervalData(startRodCislo, endRodCislo);
 //    }
 
-//    public ArrayList<PCRTestDate> getDateIntervalTest(TTTree<Date, PCRTestDate> tree, Date startDate, Date endDate) {
-//        tree.clearData();
-//        tree.setInterval((TTTreeNode<Date, PCRTestDate>) tree.getRoot(), startDate, endDate);
-//        return tree.getData();
-//    }
-
-//    public ArrayList<UzemnaJednotka> getUzemneJednotkySorted(TTTree<Integer, UzemnaJednotka> tree) {
-//        tree.clearData();
-//        tree.setInterval((TTTreeNode<Integer, UzemnaJednotka>) tree.getRoot(), Integer.MIN_VALUE, Integer.MAX_VALUE);
-//        return tree.getData();
-//    }
-
-//    public boolean writeToFile(String fileName) {
-//        String text;
-//        ArrayList<PCRTestCode> testy = this.pcrTreeCode.getInOrderData();
-//        ArrayList<Osoba> osoby = this.personTree.getInOrderData();
-//        try {
-//            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName + ".csv"));
-//            for (Osoba osoba : osoby) {
-//                text = "";
-//                text += osoba.getRodCislo() + ",";
-//                text += osoba.getMeno() + ",";
-//                text += osoba.getPriezvisko();
-//                text += "\n";
-//                writer.write(text);
-//            }
-//            writer.write("END\n");
-//            for (PCRTestCode test : testy) {
-//                text = "";
-//                text += test.getData().getKodTestu() + ",";
-//                text += test.getData().getRodCisloPacienta() + ",";
-//                text += test.getData().getKodPracoviska() + ",";
-//                text += test.getData().getKodOkresu() + ",";
-//                text += test.getData().getKodKraja() + ",";
-//                text += test.getData().isVysledok() + ",";
-//                if (test.getData().getPoznamka() != null) {
-//                    text += test.getData().getPoznamka() + ",";
-//                } else {
-//                    text += "" + ",";
-//                }
-//                Date date = test.getData().getDatum();
-//                text += date.getDate() + "-" + (date.getMonth() + 1) + "-" + (date.getYear() + 1900) + " " + date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
-//                text += "\n";
-//                writer.write(text);
-//            }
-//            writer.close();
-//            return true;
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            return false;
-//        }
-//    }
-//
-//    public boolean loadFromFile(String fileName) {
-//        try {
-//            BufferedReader reader = new BufferedReader(new FileReader(fileName + ".csv"));
-//            String line = reader.readLine();
-//            boolean readingPersons = true;
-//            SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-//            while (line != null) {
-//                //System.out.println(line);
-//                if (line.equals("END")) {
-//                    readingPersons = false;
-//                    line = reader.readLine();
-//                }
-//                String[] data = line.split(",");
-//                if (readingPersons) {
-//                    addOsoba(data[1], data[2], data[0]);
-//                } else {
-//                    Date date = formatter.parse(data[7]);
-//                    Osoba osoba = this.getOsoba(data[1]);
-//                    addPCRTest(data[0], data[1], Integer.parseInt(data[2]), Integer.parseInt(data[3]), Integer.parseInt(data[4]), Boolean.parseBoolean(data[5]), data[6], osoba, date);
-//                }
-//                line = reader.readLine();
-//            }
-//            reader.close();
-//            return true;
-//        } catch (Exception e) {
-//            System.out.println("Error: Reading");
-//            System.out.println(e.getMessage());
-//            return false;
-//        }
-//    }
-
     public boolean addPCRTest(String kodTestu, String rodCislo, int kodPracoviska, int kodOkresu, int kodKraju, boolean vysledok, String poznamka, Osoba osoba, Date datum) {
         //Date date = new Date(rok - 1900, mesiac - 1, den);
         //Osoba osoba = getOsoba(rodCislo);
         if (kodTestu == null) {
             kodTestu = UUID.randomUUID().toString();
         }
-        PCRTest pcrTest = new PCRTest(kodTestu, rodCislo, kodPracoviska, kodOkresu, kodKraju, vysledok, poznamka, osoba, datum);
+        PCRTest pcrTest = new PCRTest(kodTestu, rodCislo, kodPracoviska, kodOkresu, kodKraju, vysledok, poznamka, datum, osoba.getMyPosition());
         long testPosition = testDataFile.write(pcrTest);
-        PCRTestCode pcrTestCode = new PCRTestCode(testPosition, pcrTest.getKodTestu());
-        PCRTestDate pcrTestDate = new PCRTestDate(testPosition, pcrTest.getDatum(), pcrTest.getKodTestu());
+        PCRTestCode pcrTestCode = new PCRTestCode(pcrTest.getKodTestu(), testPosition);
+        PCRTestDate pcrTestDate = new PCRTestDate(pcrTest.getDatum(), pcrTest.getKodTestu(), testPosition);
         boolean[] isTestAdd = new boolean[9];
         for (int i = 0; i < isTestAdd.length; i++) {
             isTestAdd[i] = true;
@@ -274,50 +240,54 @@ public class Application {
     }
 
     public void removeAllData() {
-        ArrayList<Osoba> osoby = this.personTree.getInOrderData();
-        for (Osoba osoba : osoby) {
+        ArrayList<OsobaIndex> osoby = this.personTree.getInOrderData();
+        for (OsobaIndex osoba : osoby) {
             this.removeOsoba(osoba.getRodCislo());
         }
     }
 
     public Osoba removeOsoba(String rodCislo) {
-//        Osoba o = new Osoba("", "", null, rodCislo);
-//        Osoba osoba = personTree.remove(o);
-//        if (osoba != null) {
-//            ArrayList<PCRTestDate> testy = osoba.getTesty().getInOrderData();
-//            for (int i = 0; i < testy.size(); i++) {
-//                PCRTestDate test = testy.get(i);
-//                if (this.removePCRTest(test.getData().getKodTestu(), false) == null) {
-//                    return null;
-//                }
-//            }
-//            return osoba;
-//        }
+        OsobaIndex osobaIndex = new OsobaIndex(rodCislo);
+        osobaIndex = personTree.remove(osobaIndex);
+        Osoba osoba = getOsoba(osobaIndex.getDataPosition());
+        osobaDataFile.delete(osobaIndex.getDataPosition());
+        if (osoba != null) {
+            ArrayList<PCRTestDate> testy = osoba.getTesty().getInOrderData();
+            for (int i = 0; i < testy.size(); i++) {
+                PCRTestDate test = testy.get(i);
+                if (this.removePCRTest(test.getTestCode(), false) == null) {
+                    return null;
+                }
+            }
+            return osoba;
+        }
         return null;
     }
 
     public PCRTest removePCRTest(String kodTestu, boolean onlyTest) {
-//        PCRTestCode p = new PCRTestCode(kodTestu);
-//        PCRTestCode test = pcrTreeCode.remove(p);
-//        if (test == null) {
-//            return null;
-//        }
-//        PCRTestDate testDate = new PCRTestDate(test.getData());
-//        if (test.getData().isVysledok()) {
-//            getPracovisko(test.getData().getKodPracoviska()).getPozitivneTesty().removeData(testDate);
-//            getOkres(test.getData().getKodOkresu()).getPozitivneTesty().removeData(testDate);
-//            getKraj(test.getData().getKodKraja()).getPozitivneTesty().removeData(testDate);
-//            pcrTreePositive.removeData(testDate);
-//        }
-//        getPracovisko(test.getData().getKodPracoviska()).getTesty().removeData(testDate);
-//        getOkres(test.getData().getKodOkresu()).getTesty().removeData(testDate);
-//        getKraj(test.getData().getKodKraja()).getTesty().removeData(testDate);
-//        pcrTreeDate.removeData(testDate);
-//        if (onlyTest) {
-//            test.getData().getOsoba().getTesty().removeData(testDate);
-//        }
-//        return test.getData();
-        return null;
+        PCRTestCode p = new PCRTestCode(kodTestu);
+        PCRTestCode t = pcrTreeCode.remove(p);
+        if (t == null) {
+            return null;
+        }
+        PCRTest test = getPCRTest(t.getDataPosition());
+        testDataFile.delete(t.getDataPosition());
+        PCRTestDate testDate = new PCRTestDate(test.getDatum(), test.getKodTestu());
+        if (test.isVysledok()) {
+            getPracovisko(test.getKodPracoviska()).getPozitivneTesty().remove(testDate);
+            getOkres(test.getKodOkresu()).getPozitivneTesty().remove(testDate);
+            getKraj(test.getKodKraja()).getPozitivneTesty().remove(testDate);
+            pcrTreePositive.remove(testDate);
+        }
+        getPracovisko(test.getKodPracoviska()).getTesty().remove(testDate);
+        getOkres(test.getKodOkresu()).getTesty().remove(testDate);
+        getKraj(test.getKodKraja()).getTesty().remove(testDate);
+        pcrTreeDate.remove(testDate);
+        if (onlyTest) {
+            Osoba osoba = getOsoba(test.getOsobaPosition());
+            osoba.getTesty().remove(testDate);
+        }
+        return test;
     }
 
     public Osoba addOsoba(String meno, String priezvisko, String rodCislo) {
@@ -326,8 +296,11 @@ public class Application {
         int month = Integer.parseInt(rodCislo.substring(2, 4));
         int day = Integer.parseInt(rodCislo.substring(4, 6));
         Date date = new Date(year < actualDate.getYear() - 100 ? year + 100 : year, month - 1, day);
-        Osoba osoba = new models.Osoba(meno, priezvisko, date, rodCislo);
-        if (personTree.add(osoba)) {
+        Osoba osoba = new Osoba(meno, priezvisko, date, rodCislo);
+        long personPosition = osobaDataFile.write(osoba);
+        OsobaIndex osobaIndex = new OsobaIndex(osoba.getRodCislo(), personPosition);
+        osoba.setMyPosition(personPosition);
+        if (personTree.add(osobaIndex)) {
             return osoba;
         }
         return null;
