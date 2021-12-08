@@ -15,7 +15,7 @@ import java.util.*;
 public class Application {
 
     private final TTTree<OsobaIndex> personTree = new TTTree<>("personTree", new TTTreeNode<>(new OsobaIndex()));
-    private final TTTree<PCRTestCode> pcrTreeCode = new TTTree<>("pcrTreeCode", new TTTreeNode<>(new PCRTestCode()));
+    private final TTTree<PCRTestCode> pcrTreeCode = new TTTree<>("0pcrTreeCode", new TTTreeNode<>(new PCRTestCode()));
     private final TTTree<PCRTestDate> pcrTreeDate = new TTTree<>("pcrTreeDate", new TTTreeNode<>(new PCRTestDate()));
     private final TTTree<PCRTestDate> pcrTreePositive = new TTTree<>("pcrTreePositive", new TTTreeNode<>( new PCRTestDate()));
     private final TTTree<UzemnaJednotka> okresTree = new TTTree<>("okresTree", new TTTreeNode<>(new Okres()));

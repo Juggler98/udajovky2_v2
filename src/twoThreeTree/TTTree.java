@@ -22,7 +22,7 @@ public class TTTree<T extends IData<T>> {
         try {
             file = new RandomAccessFile(filename + ".txt", "rw");
             emptyPositions = new RandomAccessFile(filename + "EmptyPositions.txt", "rw");
-            //this.clearData(); // TODO: Remove it
+            //this.clearData(); // TODO: Remove it, after test
             this.node = node;
             if (file.length() == 0) {
                 writeInfoData(-1);
@@ -119,18 +119,7 @@ public class TTTree<T extends IData<T>> {
             emptyPositions.read(b);
             emptyPosition.fromByteArray(b);
 
-            while (emptyPosition.getPosition() > file.length()) {
-                emptyPositions.setLength(emptyPositions.length() - emptyPosition.getSize());
-                if (emptyPositions.length() > 0) {
-                    emptyPositions.seek(emptyPositions.length() - emptyPosition.getSize());
-                    emptyPositions.read(b);
-                    emptyPosition.fromByteArray(b);
-                } else {
-                    return file.length();
-                }
-            }
-
-            while (getFromAddress(emptyPosition.getPosition()).hasDataL()) {
+            while (emptyPosition.getPosition() > file.length() || (emptyPosition.getPosition() < file.length() && getFromAddress(emptyPosition.getPosition()).hasDataL())) {
                 emptyPositions.setLength(emptyPositions.length() - emptyPosition.getSize());
                 if (emptyPositions.length() > 0) {
                     emptyPositions.seek(emptyPositions.length() - emptyPosition.getSize());

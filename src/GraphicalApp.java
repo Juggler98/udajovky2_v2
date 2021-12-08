@@ -48,8 +48,8 @@ public class GraphicalApp {
         jPanel.setLayout(null);
         jPanel.setBounds(0, 0, jFrameWidth, jFrameHeight);
 
-        int width = 550;
-        int y = 300;
+        int width = 750;
+        int y = 280;
         jTextArea.setBounds((jFrameWidth / 2) - (width / 2), y, width, jFrameHeight - y - 52);
         jTextArea.setEditable(false);
 
@@ -344,7 +344,7 @@ public class GraphicalApp {
         x.setToolTipText("Pocet dni (X)");
 
         Date actualDate = new Date(System.currentTimeMillis());
-        date.setText(actualDate.getDate() + 1 + ".10.2021");
+        date.setText(actualDate.getDate() + 1 + ".12.2021");
         x.setText("5");
 
         date.setBounds(posun + componentWidth * posunX, componentHeight + componentDistance + 28, componentWidth, componentHeight);
@@ -507,7 +507,7 @@ public class GraphicalApp {
         x.setToolTipText("Pocet dni (X)");
 
         Date actualDate = new Date(System.currentTimeMillis());
-        date.setText(actualDate.getDate() + 1 + ".10.2021");
+        date.setText(actualDate.getDate() + 1 + ".12.2021");
         x.setText("5");
         kodUzJednotky.setText("205");
 
