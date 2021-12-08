@@ -249,6 +249,8 @@ public class Application {
     public Osoba removeOsoba(String rodCislo) {
         OsobaIndex osobaIndex = new OsobaIndex(rodCislo);
         osobaIndex = personTree.remove(osobaIndex);
+        if (osobaIndex == null)
+            return null;
         Osoba osoba = getOsoba(osobaIndex.getDataPosition());
         osobaDataFile.delete(osobaIndex.getDataPosition());
         if (osoba != null) {

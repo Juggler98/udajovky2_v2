@@ -227,6 +227,7 @@ public class GraphicalApp {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ArrayList<String> arrayList = app.getInfo();
+                jTextArea.setText("");
                 for (String s : arrayList) {
                     jTextArea.append(s);
                 }

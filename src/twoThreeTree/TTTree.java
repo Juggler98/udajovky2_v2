@@ -143,13 +143,13 @@ public class TTTree<T extends IData<T>> {
     }
 
     private void inspectEmptyPositions() {
-        System.out.println("---------ADDING-EMPTY-POSITIONS--------");
+        //System.out.println("---------ADDING-EMPTY-POSITIONS--------");
         ArrayList<Long> addedPosition = new ArrayList<>();
         for (TTTreeNode<T> node : editedNodes) {
-            System.out.println(node);
+            //System.out.println(node);
             if (!node.hasDataL()) {
                 if (!addedPosition.contains(node.getMyPosition())) {
-                    System.out.println("new empty position: " + node.getMyPosition());
+                    //System.out.println("new empty position: " + node.getMyPosition());
                     try {
                         EmptyPosition emptyPosition = new EmptyPosition(node.getMyPosition());
                         emptyPositions.seek(emptyPositions.length());
@@ -171,6 +171,9 @@ public class TTTree<T extends IData<T>> {
             file.writeInt(size);  //size
             file.seek(12);
             file.writeInt(height);  //height
+            if (size == 0 && rootPosition == -1) {
+                file.setLength(16);
+            }
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -182,6 +185,9 @@ public class TTTree<T extends IData<T>> {
             file.writeInt(size);  //size
             file.seek(12);
             file.writeInt(height);  //height
+            if (size == 0 && height == 0) {
+                file.setLength(16);
+            }
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
