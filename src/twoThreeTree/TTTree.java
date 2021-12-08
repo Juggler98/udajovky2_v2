@@ -22,7 +22,7 @@ public class TTTree<T extends IData<T>> {
         try {
             file = new RandomAccessFile(filename + ".txt", "rw");
             emptyPositions = new RandomAccessFile(filename + "EmptyPositions.txt", "rw");
-            //this.clearData(); // TODO: Remove it
+            this.clearData(); // TODO: Remove it
             this.node = node;
             if (file.length() == 0) {
                 writeInfoData(-1);

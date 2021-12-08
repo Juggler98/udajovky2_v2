@@ -292,6 +292,20 @@ public class TestGenerator {
                 this.dataInFileToConsole();
             }
 
+//            TestClass testClassTemp = new TestClass(randomValue.nextInt(randomNumberBound), "AdamBeliansky");
+//            testArrayList.add(testClassTemp.getValue());
+//            testClasses.add(testClassTemp);
+//            TestClassIndex tc = new TestClassIndex(testClassTemp.getValue(), dataFile.write(testClassTemp));
+//            boolean treeNotAdd = testTree.add(tc);
+//            if (!treeNotAdd) {
+//                addNotPossible++;
+//            }
+//            this.treeToConsole();
+//            this.dataInFileToConsole();
+//            this.emptyPositionsToConsole();
+//            this.emptyPositionsTreeToConsole();
+//            this.testArrayToConsole();
+
 //            System.out.println("-----------PREORDER------------");
 //            testTree.preorder((TTTreeNode<Integer, tests.TestClass>) testTree.getRoot());
 //
