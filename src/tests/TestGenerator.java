@@ -188,7 +188,7 @@ public class TestGenerator {
         for (int j = 0; j < testCount; j++) {
             dataFile.clearData();
             System.out.println("--------------------------NEW-TEST-------------------------------------");
-            int operationCount = 100;
+            int operationCount = 1000;
             int addCount = 0;
             int removeCount = 0;
             int addNotPossible = 0;
@@ -212,7 +212,7 @@ public class TestGenerator {
             }
 
             int addPercentage = 50;
-            int randomNumberBound = 100;
+            int randomNumberBound = 500;
             if (goRandom) {
                 for (int i = 0; i < operationCount; i++) {
                     if (i % 10000 == 0) {
@@ -405,6 +405,16 @@ public class TestGenerator {
         System.out.println("----------------TREE-FILE------------------");
         testTree.printInfo();
         ArrayList<TTTreeNode<TestClassIndex>> arrayList = testTree.getAllData();
+        int i = 0;
+        for (TTTreeNode<TestClassIndex> node : arrayList) {
+            if (node.hasDataL()) {
+                i++;
+            }
+            if (node.hasDataR()) {
+                i++;
+            }
+        }
+        System.out.println("Item count: " + i);
         for (TTTreeNode<TestClassIndex> node : arrayList) {
             System.out.println(node);
         }

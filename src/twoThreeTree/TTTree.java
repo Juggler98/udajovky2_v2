@@ -22,7 +22,7 @@ public class TTTree<T extends IData<T>> {
         try {
             file = new RandomAccessFile(filename + ".txt", "rw");
             emptyPositions = new RandomAccessFile(filename + "EmptyPositions.txt", "rw");
-            this.clearData(); // TODO: Remove it
+            //this.clearData(); // TODO: Remove it
             this.node = node;
             if (file.length() == 0) {
                 writeInfoData(-1);
@@ -94,6 +94,12 @@ public class TTTree<T extends IData<T>> {
 
     private void writeNode(TTTreeNode<T> node) {
         try {
+            if (node.getMyPosition() > file.length()) {
+                //file.seek(file.length());
+                //node.setMyPosition(file.length());
+            } else {
+                //file.seek(node.getMyPosition());
+            }
             file.seek(node.getMyPosition());
             file.write(node.toByteArray());
         } catch (Exception e) {
@@ -135,7 +141,6 @@ public class TTTree<T extends IData<T>> {
                 }
             }
 
-            //System.out.println("write to Empty position: " + emptyPosition.getPosition());
             return emptyPosition.getPosition();
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -150,14 +155,29 @@ public class TTTree<T extends IData<T>> {
             if (!node.hasDataL()) {
                 if (!addedPosition.contains(node.getMyPosition())) {
                     //System.out.println("new empty position: " + node.getMyPosition());
-                    try {
-                        EmptyPosition emptyPosition = new EmptyPosition(node.getMyPosition());
-                        emptyPositions.seek(emptyPositions.length());
-                        emptyPositions.write(emptyPosition.toByteArray());
-                        addedPosition.add(emptyPosition.getPosition());
-                    } catch (Exception e) {
-                        throw new IllegalStateException(e);
+                    node = getFromAddress(node.getMyPosition());
+                    if (!node.hasDataL() && !addedPosition.contains(node.getMyPosition())) {
+                        try {
+                            if (node.getMyPosition() == file.length() - this.node.getSize()) {
+                                file.setLength(file.length() - this.node.getSize());
+                                while (file.length() > startAddress) {
+                                    TTTreeNode<T> tempNode = getFromAddress(file.length() - this.node.getSize());
+                                    if (!tempNode.hasDataL()) {
+                                        file.setLength(file.length() - this.node.getSize());
+                                    } else {
+                                        break;
+                                    }
+                                }
+                            } else {
+                                EmptyPosition emptyPosition = new EmptyPosition(node.getMyPosition());
+                                emptyPositions.seek(emptyPositions.length());
+                                emptyPositions.write(emptyPosition.toByteArray());
+                            }
+                        } catch (Exception e) {
+                            throw new IllegalStateException(e);
+                        }
                     }
+                    addedPosition.add(node.getMyPosition());
                 }
             }
         }
@@ -172,7 +192,7 @@ public class TTTree<T extends IData<T>> {
             file.seek(12);
             file.writeInt(height);  //height
             if (size == 0 && rootPosition == -1) {
-                file.setLength(16);
+                //file.setLength(16);
             }
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -186,7 +206,7 @@ public class TTTree<T extends IData<T>> {
             file.seek(12);
             file.writeInt(height);  //height
             if (size == 0 && height == 0) {
-                file.setLength(16);
+                //file.setLength(16);
             }
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -247,7 +267,7 @@ public class TTTree<T extends IData<T>> {
      */
     public boolean add(T newData) {
         if (!tryToAdd(newData)) {
-            System.out.println("Nepodarilo sa vlozit kluc: " + newData); //TODO: Remove it
+            System.out.println("Nepodarilo sa vlozit kluc: " + newData); //TODO: Remove it, because it can spam console
             return false;
         }
         ++this.size;
@@ -293,8 +313,8 @@ public class TTTree<T extends IData<T>> {
             if (newData.compareTo(leaf.getDataL()) < 0) {
                 min = new TTTreeNode<>(getEmptyPosition(), newData);
                 writeNode(min);
-                max = new TTTreeNode<>(getEmptyPosition(), leaf.getDataR());
-                middle = new TTTreeNode<>(leaf.getMyPosition(), leaf.getDataL());
+                max = new TTTreeNode<>(leaf.getMyPosition(), leaf.getDataR());
+                middle = new TTTreeNode<>(getEmptyPosition(), leaf.getDataL());
                 //min.setLeftSon(leaf.getLeftSon());
             } else if (newData.compareTo(leaf.getDataR()) > 0) {
                 //leaf.setKeyR(node.getKeyL());
@@ -812,6 +832,7 @@ public class TTTree<T extends IData<T>> {
             if (!node.isThreeNode()) {
                 if (node.compareTo(root) == 0) {
                     root.setDataL(root.getDataL().createClass());
+                    writeNode(root);
                     editedNodes.add(root);
                     height--;
                     writeInfoData(-1);

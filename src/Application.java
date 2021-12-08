@@ -1,4 +1,5 @@
 import data.DataFile;
+import data.EmptyPosition;
 import models.*;
 import tests.TestClassIndex;
 import twoThreeTree.TTTree;
@@ -80,23 +81,67 @@ public class Application {
     public ArrayList<String> getInfo() {
         ArrayList<String> arrayList = new ArrayList<>();
         ArrayList<TTTreeNode<PCRTestCode>> arrayList2 = pcrTreeCode.getAllData();
+        arrayList.add("Strom vsetkych testov: \n");
         arrayList.add(pcrTreeCode.getInfo() + "\n");
+        int i = 0;
+        for (TTTreeNode<PCRTestCode> node : arrayList2) {
+            if (node.hasDataL()) {
+                i++;
+            }
+            if (node.hasDataR()) {
+                i++;
+            }
+        }
+        arrayList.add("Pocet dat v subore: " + i + "\n");
         for (TTTreeNode<PCRTestCode> node : arrayList2) {
             arrayList.add(node.toString() + "\n");
         }
+        ArrayList<EmptyPosition> emptyPositionArrayList = pcrTreeCode.getAllEmptyPositions();
+        arrayList.add("Empty Positions: \n");
+        for (EmptyPosition emptyPosition : emptyPositionArrayList) {
+            arrayList.add(emptyPosition.toString() + "\n");
+        }
+        arrayList.add("\nData testov: \n");
         ArrayList<PCRTest> arrayList3 = testDataFile.getAllData();
         for (PCRTest test : arrayList3) {
             arrayList.add(test.toString() + "\n");
         }
+        emptyPositionArrayList = testDataFile.getAllEmptyPositions();
+        arrayList.add("Empty Positions: \n");
+        for (EmptyPosition emptyPosition : emptyPositionArrayList) {
+            arrayList.add(emptyPosition.toString() + "\n");
+        }
 
+        arrayList.add("\nStrom osob: \n");
         arrayList.add(personTree.getInfo() + "\n");
         ArrayList<TTTreeNode<OsobaIndex>> arrayList4 = personTree.getAllData();
+        i = 0;
+        for (TTTreeNode<OsobaIndex> node : arrayList4) {
+            if (node.hasDataL()) {
+                i++;
+            }
+            if (node.hasDataR()) {
+                i++;
+            }
+        }
+        arrayList.add("Pocet dat v subore: " + i + "\n");
         for (TTTreeNode<OsobaIndex> node : arrayList4) {
             arrayList.add(node.toString() + "\n");
         }
+        emptyPositionArrayList = personTree.getAllEmptyPositions();
+        arrayList.add("Empty Positions: \n");
+        for (EmptyPosition emptyPosition : emptyPositionArrayList) {
+            arrayList.add(emptyPosition.toString() + "\n");
+        }
+        arrayList.add("\nData osob: \n");
         ArrayList<Osoba> arrayList5 = osobaDataFile.getAllData();
         for (Osoba osoba : arrayList5) {
             arrayList.add(osoba.toString() + "\n");
+        }
+        emptyPositionArrayList = osobaDataFile.getAllEmptyPositions();
+        arrayList.add("Empty Positions: \n");
+        for (EmptyPosition emptyPosition : emptyPositionArrayList) {
+            arrayList.add(emptyPosition.toString() + "\n");
         }
         return arrayList;
     }

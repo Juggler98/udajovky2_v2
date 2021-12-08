@@ -9,9 +9,9 @@ public class Main {
 
         TestGenerator testGenerator = new TestGenerator();
         //testGenerator.runTests();
-        testGenerator.runTestsTree();
+        //testGenerator.runTestsTree();
 
-        //new GraphicalApp();
+        new GraphicalApp();
 
     }
 
