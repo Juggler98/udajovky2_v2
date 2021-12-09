@@ -1,7 +1,7 @@
 package models;
 
-import twoThreeTree.TTTree;
-import twoThreeTree.TTTreeNode;
+import BOrderThreeTree.BOTTree;
+import BOrderThreeTree.BOTTreeNode;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,14 +17,14 @@ public abstract class UzemnaJednotka implements IData<UzemnaJednotka> {
     private static final char EMPTY_CHAR = '*';
     private static final int NAME_LENGTH = 64;
 
-    private TTTree<PCRTestDate> testy;
-    private TTTree<PCRTestDate> pozitivneTesty;
+    private BOTTree<PCRTestDate> testy;
+    private BOTTree<PCRTestDate> pozitivneTesty;
 
     UzemnaJednotka(Integer kod, String nazov) {
         this.kod = kod;
         this.nazov = nazov;
-        testy = new TTTree<>(nazov, new TTTreeNode<>(new PCRTestDate()));
-        pozitivneTesty = new TTTree<>(nazov + "Positive", new TTTreeNode<>(new PCRTestDate()));
+        testy = new BOTTree<>(nazov, new BOTTreeNode<>(new PCRTestDate()));
+        pozitivneTesty = new BOTTree<>(nazov + "Positive", new BOTTreeNode<>(new PCRTestDate()));
     }
 
     public UzemnaJednotka() {
@@ -84,8 +84,8 @@ public abstract class UzemnaJednotka implements IData<UzemnaJednotka> {
             }
 
             if (valid) {
-                testy = new TTTree<>(nazov, new TTTreeNode<>(new PCRTestDate()));
-                pozitivneTesty = new TTTree<>(nazov + "Positive", new TTTreeNode<>(new PCRTestDate()));
+                testy = new BOTTree<>(nazov, new BOTTreeNode<>(new PCRTestDate()));
+                pozitivneTesty = new BOTTree<>(nazov + "Positive", new BOTTreeNode<>(new PCRTestDate()));
             }
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -118,11 +118,11 @@ public abstract class UzemnaJednotka implements IData<UzemnaJednotka> {
         return kod.compareTo(u.kod);
     }
 
-    public TTTree<PCRTestDate> getTesty() {
+    public BOTTree<PCRTestDate> getTesty() {
         return testy;
     }
 
-    public TTTree<PCRTestDate> getPozitivneTesty() {
+    public BOTTree<PCRTestDate> getPozitivneTesty() {
         return this.pozitivneTesty;
     }
 

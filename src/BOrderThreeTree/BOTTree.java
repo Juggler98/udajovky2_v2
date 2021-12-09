@@ -1,4 +1,4 @@
-package twoThreeTree;
+package BOrderThreeTree;
 
 import data.EmptyPosition;
 import models.IData;
@@ -6,19 +6,19 @@ import models.IData;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 
-public class TTTree<T extends IData<T>> {
+public class BOTTree<T extends IData<T>> {
 
     private int size = 0;
     private int height = 0;
 
     private final RandomAccessFile file;
     private final RandomAccessFile emptyPositions;
-    private final TTTreeNode<T> node;
+    private final BOTTreeNode<T> node;
     private final long startAddress = 16;
 
-    ArrayList<TTTreeNode<T>> editedNodes = new ArrayList<>();
+    ArrayList<BOTTreeNode<T>> editedNodes = new ArrayList<>();
 
-    public TTTree(String filename, TTTreeNode<T> node) {
+    public BOTTree(String filename, BOTTreeNode<T> node) {
         try {
             file = new RandomAccessFile(filename + ".txt", "rw");
             emptyPositions = new RandomAccessFile(filename + "EmptyPositions.txt", "rw");
@@ -64,7 +64,7 @@ public class TTTree<T extends IData<T>> {
         }
     }
 
-    private TTTreeNode<T> getFromAddress(long address) {
+    private BOTTreeNode<T> getFromAddress(long address) {
         if (address == -1) {
             return null;
         }
@@ -72,7 +72,7 @@ public class TTTree<T extends IData<T>> {
             byte[] b = new byte[node.getSize()];
             file.seek(address);
             file.read(b);
-            TTTreeNode<T> node = (TTTreeNode<T>) this.node.createClass();
+            BOTTreeNode<T> node = (BOTTreeNode<T>) this.node.createClass();
             node.setMyPosition(address);
             node.fromByteArray(b);
             return node;
@@ -81,7 +81,7 @@ public class TTTree<T extends IData<T>> {
         }
     }
 
-    public TTTreeNode<T> getRoot() {
+    public BOTTreeNode<T> getRoot() {
         try {
             if (file.length() == 0)
                 return null;
@@ -92,7 +92,7 @@ public class TTTree<T extends IData<T>> {
         }
     }
 
-    private void writeNode(TTTreeNode<T> node) {
+    private void writeNode(BOTTreeNode<T> node) {
         try {
             if (node.getMyPosition() > file.length()) {
                 //file.seek(file.length());
@@ -139,7 +139,7 @@ public class TTTree<T extends IData<T>> {
     private void inspectEmptyPositions() {
         //System.out.println("---------ADDING-EMPTY-POSITIONS--------");
         ArrayList<Long> addedPosition = new ArrayList<>();
-        for (TTTreeNode<T> node : editedNodes) {
+        for (BOTTreeNode<T> node : editedNodes) {
             //System.out.println(node);
             if (!node.hasDataL()) {
                 if (!addedPosition.contains(node.getMyPosition())) {
@@ -150,7 +150,7 @@ public class TTTree<T extends IData<T>> {
                             if (node.getMyPosition() == file.length() - this.node.getSize()) {
                                 file.setLength(file.length() - this.node.getSize());
                                 while (file.length() > startAddress) {
-                                    TTTreeNode<T> tempNode = getFromAddress(file.length() - this.node.getSize());
+                                    BOTTreeNode<T> tempNode = getFromAddress(file.length() - this.node.getSize());
                                     if (!tempNode.hasDataL()) {
                                         file.setLength(file.length() - this.node.getSize());
                                     } else {
@@ -233,13 +233,13 @@ public class TTTree<T extends IData<T>> {
 
     }
 
-    public ArrayList<TTTreeNode<T>> getAllData() {
-        ArrayList<TTTreeNode<T>> list = new ArrayList<>();
+    public ArrayList<BOTTreeNode<T>> getAllData() {
+        ArrayList<BOTTreeNode<T>> list = new ArrayList<>();
         try {
             byte[] b = new byte[node.getSize()];
             file.seek(16);
             while (file.read(b) != -1) {
-                TTTreeNode<T> newNodeData = (TTTreeNode<T>) node.createClass();
+                BOTTreeNode<T> newNodeData = (BOTTreeNode<T>) node.createClass();
                 newNodeData.fromByteArray(b);
                 newNodeData.setMyPosition(file.getFilePointer() - node.getSize());
                 list.add(newNodeData);
@@ -265,25 +265,25 @@ public class TTTree<T extends IData<T>> {
     }
 
     private boolean tryToAdd(T newData) {
-        TTTreeNode<T> root = getRoot();
+        BOTTreeNode<T> root = getRoot();
         if (root == null) {
-            root = new TTTreeNode<>(startAddress, newData);
+            root = new BOTTreeNode<>(startAddress, newData);
             ++height;
             writeNode(root);
             writeInfoData(root.getMyPosition());
             return true;
         }
 
-        TTTreeNode<T> leaf = this.findLeaf(newData);
+        BOTTreeNode<T> leaf = this.findLeaf(newData);
 
 //        System.out.println("leaf: " + leaf);
 
         if (leaf == null)
             return false;
 
-        TTTreeNode<T> min = null;
-        TTTreeNode<T> max = null;
-        TTTreeNode<T> middle = null;
+        BOTTreeNode<T> min = null;
+        BOTTreeNode<T> max = null;
+        BOTTreeNode<T> middle = null;
         while (true) {
             if (!leaf.isThreeNode()) {
                 if (leaf.getDataL().compareTo(newData) < 0) {
@@ -297,30 +297,30 @@ public class TTTree<T extends IData<T>> {
                 //leaf.setParent(leafParentMap.get("parent"));
                 return true;
             }
-            TTTreeNode<T> tempMin = min;
-            TTTreeNode<T> tempMax = max;
+            BOTTreeNode<T> tempMin = min;
+            BOTTreeNode<T> tempMax = max;
             if (newData.compareTo(leaf.getDataL()) < 0) {
-                min = new TTTreeNode<>(getEmptyPosition(), newData);
+                min = new BOTTreeNode<>(getEmptyPosition(), newData);
                 writeNode(min);
-                max = new TTTreeNode<>(leaf.getMyPosition(), leaf.getDataR());
-                middle = new TTTreeNode<>(getEmptyPosition(), leaf.getDataL());
+                max = new BOTTreeNode<>(leaf.getMyPosition(), leaf.getDataR());
+                middle = new BOTTreeNode<>(getEmptyPosition(), leaf.getDataL());
                 //min.setLeftSon(leaf.getLeftSon());
             } else if (newData.compareTo(leaf.getDataR()) > 0) {
                 //leaf.setKeyR(node.getKeyL());
                 //leaf.setDataR(node.getDataL());
-                min = new TTTreeNode<>(leaf.getMyPosition(), leaf.getDataL());
-                max = new TTTreeNode<>(getEmptyPosition(), newData);
+                min = new BOTTreeNode<>(leaf.getMyPosition(), leaf.getDataL());
+                max = new BOTTreeNode<>(getEmptyPosition(), newData);
                 writeNode(max);
-                middle = new TTTreeNode<>(getEmptyPosition(), leaf.getDataR());
+                middle = new BOTTreeNode<>(getEmptyPosition(), leaf.getDataR());
             } else {
-                min = new TTTreeNode<>(leaf.getMyPosition(), leaf.getDataL());
-                max = new TTTreeNode<>(getEmptyPosition(), leaf.getDataR());
+                min = new BOTTreeNode<>(leaf.getMyPosition(), leaf.getDataL());
+                max = new BOTTreeNode<>(getEmptyPosition(), leaf.getDataR());
                 writeNode(max);
-                middle = new TTTreeNode<>(getEmptyPosition(), newData);
+                middle = new BOTTreeNode<>(getEmptyPosition(), newData);
             }
             if (tempMin != null && tempMax != null) {
-                TTTreeNode<T> a;
-                TTTreeNode<T> b;
+                BOTTreeNode<T> a;
+                BOTTreeNode<T> b;
                 if (tempMin.getDataL().compareTo(leaf.getDataL()) < 0) {
                     min.setLeftSon(tempMin.getMyPosition());
                     min.setRightSon(tempMax.getMyPosition());
@@ -363,7 +363,7 @@ public class TTTree<T extends IData<T>> {
                 writeNode(b);
             }
             if (leaf.hasParent()) {
-                TTTreeNode<T> leafParent = getFromAddress(leaf.getParent());
+                BOTTreeNode<T> leafParent = getFromAddress(leaf.getParent());
                 if (!leafParent.isThreeNode()) {
                     //System.out.println(leafParent.getDataL().getKey());
                     if (leafParent.getDataL().compareTo(middle.getDataL()) < 0) {
@@ -418,7 +418,7 @@ public class TTTree<T extends IData<T>> {
     Implementovane podla vlastneho navrhu.
      */
     public ArrayList<T> getIntervalData(T start, T end) {
-        TTTreeNode<T> leaf = getRoot();
+        BOTTreeNode<T> leaf = getRoot();
         if (leaf == null) {
             return getInOrderDataInterval(leaf, start, end, true);
         }
@@ -475,12 +475,12 @@ public class TTTree<T extends IData<T>> {
         return getInOrderDataInterval(leaf, start, end, left);
     }
 
-    private ArrayList<T> getInOrderDataInterval(TTTreeNode<T> node, T start, T end, boolean left) {
+    private ArrayList<T> getInOrderDataInterval(BOTTreeNode<T> node, T start, T end, boolean left) {
         ArrayList<T> data = new ArrayList<>();
         if (node == null) {
             return data;
         }
-        TTTreeNode<T> current = node;
+        BOTTreeNode<T> current = node;
         T actualData;
 
         if (!current.isLeaf()) {
@@ -568,7 +568,7 @@ public class TTTree<T extends IData<T>> {
     Implementovane podla vlastneho navrhu.
      */
     public ArrayList<T> getInOrderData() {
-        TTTreeNode<T> current = getRoot();
+        BOTTreeNode<T> current = getRoot();
         ArrayList<T> data = new ArrayList<>();
         if (current == null) {
             return data;
@@ -622,7 +622,7 @@ public class TTTree<T extends IData<T>> {
     /*
     Len pre testove ucely.
      */
-    public void inOrderRecursive(TTTreeNode<T> node) {
+    public void inOrderRecursive(BOTTreeNode<T> node) {
         if (node == null)
             return;
         inOrderRecursive(getFromAddress(node.getLeftSon()));
@@ -634,7 +634,7 @@ public class TTTree<T extends IData<T>> {
     /*
     Len pre testove ucely.
      */
-    public void preorder(TTTreeNode<T> node) {
+    public void preorder(BOTTreeNode<T> node) {
         if (node == null)
             return;
         node.vypis();
@@ -647,13 +647,13 @@ public class TTTree<T extends IData<T>> {
     Len pre testove ucely. Vypis hlbky kazdeho listu pomocou rekurzie.
     Implementacia inspirovana podla toho, co som pocul na cviceni.
      */
-    public void deepOfLeaf(TTTreeNode<T> node) {
+    public void deepOfLeaf(BOTTreeNode<T> node) {
         if (node == null) {
             //System.out.println("null");
             return;
         }
         if (node.isLeaf()) {
-            TTTreeNode<T> leaf = node;
+            BOTTreeNode<T> leaf = node;
             int deep = 1;
             while (true) {
                 if (leaf.hasParent()) {
@@ -670,8 +670,8 @@ public class TTTree<T extends IData<T>> {
         deepOfLeaf(getFromAddress(node.getRightSon()));
     }
 
-    private TTTreeNode<T> findLeaf(T data) {
-        TTTreeNode<T> leaf = getRoot();
+    private BOTTreeNode<T> findLeaf(T data) {
+        BOTTreeNode<T> leaf = getRoot();
         while (true) {
             if (leaf.isThreeNode()) {
                 if (data.compareTo(leaf.getDataL()) < 0) {
@@ -724,7 +724,7 @@ public class TTTree<T extends IData<T>> {
     Implementovane podla slovneho popisu z prednaskoveho dokumentu.
      */
     public T search(T data) {
-        TTTreeNode<T> result = searchNode(data);
+        BOTTreeNode<T> result = searchNode(data);
         if (result == null) {
             return null;
         }
@@ -736,8 +736,8 @@ public class TTTree<T extends IData<T>> {
         return null;
     }
 
-    private TTTreeNode<T> searchNode(T data) {
-        TTTreeNode<T> result = getRoot();
+    private BOTTreeNode<T> searchNode(T data) {
+        BOTTreeNode<T> result = getRoot();
         if (result == null) {
             return null;
         }
@@ -786,7 +786,7 @@ public class TTTree<T extends IData<T>> {
         Implementovane podla slovneho popisu z prednaskoveho dokumentu.
     */
     public T remove(T data) {
-        TTTreeNode<T> node = searchNode(data);
+        BOTTreeNode<T> node = searchNode(data);
         if (node == null) {
             System.out.println("Mazanie, prvok neexistuje: " + data);
             return null;
@@ -811,12 +811,12 @@ public class TTTree<T extends IData<T>> {
         return deletedData;
     }
 
-    private boolean tryToRemove(TTTreeNode<T> node, boolean leftToDelete) {
+    private boolean tryToRemove(BOTTreeNode<T> node, boolean leftToDelete) {
         //System.out.println("---------------tryToRemove------------------");
         //System.out.println("key to delete: " + (leftToDelete ? node.getDataL().getKey() : node.getDataR().getKey()));
         //System.out.println("root: " + root.getDataL().getKey());
         //System.out.println("root left son: " + root.getLeftSon().getKeyL());
-        TTTreeNode<T> root = getRoot();
+        BOTTreeNode<T> root = getRoot();
         if (node.isLeaf()) {
             if (!node.isThreeNode()) {
                 if (node.compareTo(root) == 0) {
@@ -841,7 +841,7 @@ public class TTTree<T extends IData<T>> {
                 return true;
             }
         }
-        TTTreeNode<T> inOrderLeaf = node;
+        BOTTreeNode<T> inOrderLeaf = node;
         if (!node.isLeaf()) {
             inOrderLeaf = findInOrderLeaf(node, leftToDelete);
             //System.out.println("replacing: " + inOrderLeaf.getDataL().getKey());
@@ -922,15 +922,15 @@ public class TTTree<T extends IData<T>> {
                 return true;
             }
 
-            TTTreeSonType inOrderLeafSonType = getSonType(inOrderLeaf);
-            TTTreeNode<T> parent = getFromAddress(inOrderLeaf.getParent());
+            BOTTreeSonType inOrderLeafSonType = getSonType(inOrderLeaf);
+            BOTTreeNode<T> parent = getFromAddress(inOrderLeaf.getParent());
             //System.out.println(parent.getLeftSon().getKeyL());
             //System.out.println(inOrderLeafSonType);
-            if (inOrderLeafSonType == TTTreeSonType.LEFT) {
+            if (inOrderLeafSonType == BOTTreeSonType.LEFT) {
                 //System.out.println("SonType.LEFT");
-                TTTreeNode<T> a;
-                TTTreeNode<T> b = null;
-                TTTreeNode<T> c = null;
+                BOTTreeNode<T> a;
+                BOTTreeNode<T> b = null;
+                BOTTreeNode<T> c = null;
                 a = getFromAddress(parent.getMiddleSon());
                 if ((parent.isThreeNode() && a.isThreeNode()) || (!parent.isThreeNode() && getFromAddress(parent.getRightSon()).isThreeNode())) {
                     if (parent.isThreeNode()) {
@@ -1041,11 +1041,11 @@ public class TTTree<T extends IData<T>> {
                 }
                 editedNodes.add(parent);
                 writeNode(parent);
-            } else if (inOrderLeafSonType == TTTreeSonType.RIGHT) {
+            } else if (inOrderLeafSonType == BOTTreeSonType.RIGHT) {
                 //System.out.println("SonType.RIGHT");
-                TTTreeNode<T> a;
-                TTTreeNode<T> b = null;
-                TTTreeNode<T> c = null;
+                BOTTreeNode<T> a;
+                BOTTreeNode<T> b = null;
+                BOTTreeNode<T> c = null;
                 a = getFromAddress(parent.getMiddleSon());
                 b = getFromAddress(parent.getLeftSon());
                 c = getFromAddress(inOrderLeaf.getLeftSon());
@@ -1169,10 +1169,10 @@ public class TTTree<T extends IData<T>> {
                     //parent.setRightSon(null);
                 }
             } else {
-                TTTreeNode<T> a;
-                TTTreeNode<T> b = null;
-                TTTreeNode<T> c = null;
-                TTTreeNode<T> d = null;
+                BOTTreeNode<T> a;
+                BOTTreeNode<T> b = null;
+                BOTTreeNode<T> c = null;
+                BOTTreeNode<T> d = null;
                 a = getFromAddress(parent.getLeftSon());
                 b = getFromAddress(parent.getRightSon());
                 c = getFromAddress(inOrderLeaf.getLeftSon());
@@ -1272,26 +1272,26 @@ public class TTTree<T extends IData<T>> {
         //return false;
     }
 
-    private TTTreeSonType getSonType(TTTreeNode<T> node) {
+    private BOTTreeSonType getSonType(BOTTreeNode<T> node) {
         if (node != null) {
-            TTTreeNode<T> parent = getFromAddress(node.getParent());
+            BOTTreeNode<T> parent = getFromAddress(node.getParent());
             if (parent != null) {
                 if (parent.getRightSon() != -1 && parent.getRightSon() == node.getMyPosition()) {
-                    return TTTreeSonType.RIGHT;
+                    return BOTTreeSonType.RIGHT;
                 }
                 if (parent.getMiddleSon() != -1 && parent.getMiddleSon() == node.getMyPosition()) {
-                    return TTTreeSonType.MIDDLE;
+                    return BOTTreeSonType.MIDDLE;
                 }
                 if (parent.getLeftSon() != -1 && parent.getLeftSon() == node.getMyPosition()) {
-                    return TTTreeSonType.LEFT;
+                    return BOTTreeSonType.LEFT;
                 }
             }
         }
         return null;
     }
 
-    private TTTreeNode<T> findInOrderLeaf(TTTreeNode<T> node, boolean leftToDelete) {
-        TTTreeNode<T> result = null;
+    private BOTTreeNode<T> findInOrderLeaf(BOTTreeNode<T> node, boolean leftToDelete) {
+        BOTTreeNode<T> result = null;
         if (leftToDelete) {
             if (node.isThreeNode()) {
                 if (node.hasMiddleSon()) {

@@ -1,4 +1,4 @@
-package twoThreeTree;
+package BOrderThreeTree;
 
 import models.IData;
 
@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
-public class TTTreeNode<T extends IData<T>> implements IData {
+public class BOTTreeNode<T extends IData<T>> implements IData {
 
     private long parent = -1;
     private long leftSon = -1;
@@ -20,14 +20,14 @@ public class TTTreeNode<T extends IData<T>> implements IData {
     private T dataL;
     private T dataR;
 
-    public TTTreeNode(long myPosition, T data) {
+    public BOTTreeNode(long myPosition, T data) {
         this.dataL = data;
         this.dataR = dataL.createClass();
         //this.positionsDataL = dataPosition;
         this.myPosition = myPosition;
     }
 
-    public TTTreeNode(T data) {
+    public BOTTreeNode(T data) {
         dataL = data;
         dataR = dataL.createClass();
     }
@@ -106,13 +106,13 @@ public class TTTreeNode<T extends IData<T>> implements IData {
 
     @Override
     public Object createClass() {
-        return new TTTreeNode<>(dataL.createClass());
+        return new BOTTreeNode<>(dataL.createClass());
     }
 
     @Override
     public int compareTo(Object object) {
         Long m = myPosition;
-        TTTreeNode<T> o = (TTTreeNode<T>) object;
+        BOTTreeNode<T> o = (BOTTreeNode<T>) object;
         return m.compareTo(o.myPosition);
     }
 

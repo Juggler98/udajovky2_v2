@@ -1,7 +1,7 @@
 package models;
 
-import twoThreeTree.TTTree;
-import twoThreeTree.TTTreeNode;
+import BOrderThreeTree.BOTTree;
+import BOrderThreeTree.BOTTreeNode;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,7 +15,7 @@ public class Osoba implements IData<Osoba> {
     private String priezvisko = "";
     private final Date datumNarodenia;
     private String rodCislo = "";
-    private TTTree<PCRTestDate> testy;
+    private BOTTree<PCRTestDate> testy;
     private long myPosition;
     private boolean valid = true;
     private final char emptyChar = '*';
@@ -28,7 +28,7 @@ public class Osoba implements IData<Osoba> {
         this.priezvisko = priezvisko;
         this.rodCislo = rodCislo;
         this.datumNarodenia = datumNarodenia;
-        testy = new TTTree<>(rodCislo, new TTTreeNode<>(new PCRTestDate()));
+        testy = new BOTTree<>(rodCislo, new BOTTreeNode<>(new PCRTestDate()));
     }
 
     public Osoba() {
@@ -47,7 +47,7 @@ public class Osoba implements IData<Osoba> {
         this.myPosition = myPosition;
     }
 
-    public TTTree<PCRTestDate> getTesty() {
+    public BOTTree<PCRTestDate> getTesty() {
         return testy;
     }
 
@@ -153,7 +153,7 @@ public class Osoba implements IData<Osoba> {
             valid = dataInputStream.readBoolean();
 
             if (valid) {
-                testy = new TTTree<>(rodCislo, new TTTreeNode<>(new PCRTestDate()));
+                testy = new BOTTree<>(rodCislo, new BOTTreeNode<>(new PCRTestDate()));
             }
         } catch (Exception e) {
             throw new IllegalStateException(e);

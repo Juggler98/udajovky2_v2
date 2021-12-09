@@ -2,18 +2,17 @@ package tests;
 
 import data.DataFile;
 import data.EmptyPosition;
-import twoThreeTree.TTTree;
-import twoThreeTree.TTTreeNode;
+import BOrderThreeTree.BOTTree;
+import BOrderThreeTree.BOTTreeNode;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Random;
 
 public class TestGenerator {
 
     private DataFile<TestClass> dataFile = new DataFile<>("0TestClass", new TestClass());
-    private TTTree<TestClassIndex> testTree;
+    private BOTTree<TestClassIndex> testTree;
     private ArrayList<Integer> testArrayList;
     private Random randomValue = new Random();
     private Random randomForOperation = new Random();
@@ -199,7 +198,7 @@ public class TestGenerator {
             randomValue.setSeed(randomValueSeed);
             randomForOperation.setSeed(randomForOperationSeed);
             testArrayList = new ArrayList<>();
-            testTree = new TTTree<>("0testingTree", new TTTreeNode<>(new TestClassIndex()));
+            testTree = new BOTTree<>("0testingTree", new BOTTreeNode<>(new TestClassIndex()));
             ArrayList<TestClass> testClasses = new ArrayList<>();
 
             boolean goRandom = true;
@@ -404,9 +403,9 @@ public class TestGenerator {
     public void treeToConsole() {
         System.out.println("----------------TREE-FILE------------------");
         testTree.printInfo();
-        ArrayList<TTTreeNode<TestClassIndex>> arrayList = testTree.getAllData();
+        ArrayList<BOTTreeNode<TestClassIndex>> arrayList = testTree.getAllData();
         int i = 0;
-        for (TTTreeNode<TestClassIndex> node : arrayList) {
+        for (BOTTreeNode<TestClassIndex> node : arrayList) {
             if (node.hasDataL()) {
                 i++;
             }
@@ -415,7 +414,7 @@ public class TestGenerator {
             }
         }
         System.out.println("Item count: " + i);
-        for (TTTreeNode<TestClassIndex> node : arrayList) {
+        for (BOTTreeNode<TestClassIndex> node : arrayList) {
             System.out.println(node);
         }
     }

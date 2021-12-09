@@ -1,25 +1,19 @@
 import data.DataFile;
 import data.EmptyPosition;
 import models.*;
-import tests.TestClassIndex;
-import twoThreeTree.TTTree;
-import twoThreeTree.TTTreeNode;
+import BOrderThreeTree.BOTTree;
+import BOrderThreeTree.BOTTreeNode;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Application {
 
-    private final TTTree<OsobaIndex> personTree = new TTTree<>("personTree", new TTTreeNode<>(new OsobaIndex()));
-    private final TTTree<PCRTestCode> pcrTreeCode = new TTTree<>("0pcrTreeCode", new TTTreeNode<>(new PCRTestCode()));
-    private final TTTree<PCRTestDate> pcrTreeDate = new TTTree<>("pcrTreeDate", new TTTreeNode<>(new PCRTestDate()));
-    private final TTTree<PCRTestDate> pcrTreePositive = new TTTree<>("pcrTreePositive", new TTTreeNode<>( new PCRTestDate()));
-    private final TTTree<UzemnaJednotka> okresTree = new TTTree<>("okresTree", new TTTreeNode<>(new Okres()));
-    private final TTTree<UzemnaJednotka> pracoviskoTree = new TTTree<>("pracoviskoTree", new TTTreeNode<>(new Pracovisko()));
+    private final BOTTree<OsobaIndex> personTree = new BOTTree<>("personTree", new BOTTreeNode<>(new OsobaIndex()));
+    private final BOTTree<PCRTestCode> pcrTreeCode = new BOTTree<>("0pcrTreeCode", new BOTTreeNode<>(new PCRTestCode()));
+    private final BOTTree<PCRTestDate> pcrTreeDate = new BOTTree<>("pcrTreeDate", new BOTTreeNode<>(new PCRTestDate()));
+    private final BOTTree<PCRTestDate> pcrTreePositive = new BOTTree<>("pcrTreePositive", new BOTTreeNode<>( new PCRTestDate()));
+    private final BOTTree<UzemnaJednotka> okresTree = new BOTTree<>("okresTree", new BOTTreeNode<>(new Okres()));
+    private final BOTTree<UzemnaJednotka> pracoviskoTree = new BOTTree<>("pracoviskoTree", new BOTTreeNode<>(new Pracovisko()));
     private final ArrayList<Osoba> randomOsoby = new ArrayList<>();
 
     private final DataFile<PCRTest> testDataFile = new DataFile<>("testDataFile", new PCRTest());
@@ -69,22 +63,22 @@ public class Application {
         //treeToConsole(pracoviskoTree);
     }
 
-    public void treeToConsole(TTTree<?> tree) {
+    public void treeToConsole(BOTTree<?> tree) {
         System.out.println("----------------TREE-FILE------------------");
         tree.printInfo();
-        ArrayList<? extends TTTreeNode<?>> arrayList = tree.getAllData();
-        for (TTTreeNode<?> node : arrayList) {
+        ArrayList<? extends BOTTreeNode<?>> arrayList = tree.getAllData();
+        for (BOTTreeNode<?> node : arrayList) {
             System.out.println(node);
         }
     }
 
     public ArrayList<String> getInfo() {
         ArrayList<String> arrayList = new ArrayList<>();
-        ArrayList<TTTreeNode<PCRTestCode>> arrayList2 = pcrTreeCode.getAllData();
+        ArrayList<BOTTreeNode<PCRTestCode>> arrayList2 = pcrTreeCode.getAllData();
         arrayList.add("Strom vsetkych testov: \n");
         arrayList.add(pcrTreeCode.getInfo() + "\n");
         int i = 0;
-        for (TTTreeNode<PCRTestCode> node : arrayList2) {
+        for (BOTTreeNode<PCRTestCode> node : arrayList2) {
             if (node.hasDataL()) {
                 i++;
             }
@@ -93,7 +87,7 @@ public class Application {
             }
         }
         arrayList.add("Pocet dat v subore: " + i + "\n");
-        for (TTTreeNode<PCRTestCode> node : arrayList2) {
+        for (BOTTreeNode<PCRTestCode> node : arrayList2) {
             arrayList.add(node.toString() + "\n");
         }
         ArrayList<EmptyPosition> emptyPositionArrayList = pcrTreeCode.getAllEmptyPositions();
@@ -114,9 +108,9 @@ public class Application {
 
         arrayList.add("\nStrom osob: \n");
         arrayList.add(personTree.getInfo() + "\n");
-        ArrayList<TTTreeNode<OsobaIndex>> arrayList4 = personTree.getAllData();
+        ArrayList<BOTTreeNode<OsobaIndex>> arrayList4 = personTree.getAllData();
         i = 0;
-        for (TTTreeNode<OsobaIndex> node : arrayList4) {
+        for (BOTTreeNode<OsobaIndex> node : arrayList4) {
             if (node.hasDataL()) {
                 i++;
             }
@@ -125,7 +119,7 @@ public class Application {
             }
         }
         arrayList.add("Pocet dat v subore: " + i + "\n");
-        for (TTTreeNode<OsobaIndex> node : arrayList4) {
+        for (BOTTreeNode<OsobaIndex> node : arrayList4) {
             arrayList.add(node.toString() + "\n");
         }
         emptyPositionArrayList = personTree.getAllEmptyPositions();
@@ -166,11 +160,11 @@ public class Application {
         return krajCodes;
     }
 
-    public TTTree<PCRTestDate> getPcrTreeDate() {
+    public BOTTree<PCRTestDate> getPcrTreeDate() {
         return pcrTreeDate;
     }
 
-    public TTTree<PCRTestDate> getPcrTreePositive() {
+    public BOTTree<PCRTestDate> getPcrTreePositive() {
         return pcrTreePositive;
     }
 

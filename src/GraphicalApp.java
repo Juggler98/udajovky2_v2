@@ -1,6 +1,4 @@
 import models.*;
-import twoThreeTree.TTTree;
-import twoThreeTree.TTTreeNode;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
