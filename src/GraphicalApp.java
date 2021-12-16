@@ -273,7 +273,7 @@ public class GraphicalApp {
                         }
                         text += "\nOsoba:\n";
                         text += String.format("Rodne cislo: %s\n", test.getRodCisloPacienta());
-                        Osoba osoba = app.getOsoba(test.getOsobaPosition());
+                        Osoba osoba = app.getOsoba(test.getRodCisloPacienta());
                         if (osoba != null) {
                             text += String.format("Meno: %s\n", osoba.getMeno());
                             text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());
@@ -623,7 +623,7 @@ public class GraphicalApp {
                             text += "----------------------------------";
                             text += String.format("\nOsoba %d\n", index);
                             text += String.format("Rodne cislo: %s\n", t.getRodCisloPacienta());
-                            Osoba osoba = app.getOsoba(t.getOsobaPosition());
+                            Osoba osoba = app.getOsoba(t.getRodCisloPacienta());
                             if (osoba != null) {
                                 text += String.format("Meno: %s\n", osoba.getMeno());
                                 text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());
@@ -837,7 +837,7 @@ public class GraphicalApp {
                         }
                         text += "\nOsoba:\n";
                         text += String.format("Rodne cislo: %s\n", t.getRodCisloPacienta());
-                        Osoba osoba = app.getOsoba(t.getOsobaPosition());
+                        Osoba osoba = app.getOsoba(t.getRodCisloPacienta());
                         if (osoba != null) {
                             text += String.format("Meno: %s\n", osoba.getMeno());
                             text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());
@@ -1041,7 +1041,7 @@ public class GraphicalApp {
                         }
                         text += "\nOsoba:\n";
                         text += String.format("Rodne cislo: %s\n", test.getRodCisloPacienta());
-                        Osoba osoba = app.getOsoba(test.getOsobaPosition());
+                        Osoba osoba = app.getOsoba(test.getRodCisloPacienta());
                         if (osoba != null) {
                             text += String.format("Meno: %s\n", osoba.getMeno());
                             text += String.format("Priezvisko: %s\n", osoba.getPriezvisko());

@@ -16,7 +16,6 @@ public class Osoba implements IData<Osoba> {
     private final Date datumNarodenia;
     private String rodCislo = "";
     private BOTTree<PCRTestDate> testy;
-    private long myPosition;
     private boolean valid = true;
     private final char emptyChar = '*';
     private static final int MENO_LENGTH = 15;
@@ -31,6 +30,11 @@ public class Osoba implements IData<Osoba> {
         testy = new BOTTree<>(rodCislo, new BOTTreeNode<>(new PCRTestDate()));
     }
 
+    public Osoba(String rodCislo) {
+        this.rodCislo = rodCislo;
+        datumNarodenia = new Date();
+    }
+
     public Osoba() {
         meno = "";
         priezvisko = "";
@@ -39,13 +43,13 @@ public class Osoba implements IData<Osoba> {
         datumNarodenia = new Date();
     }
 
-    public long getMyPosition() {
-        return myPosition;
-    }
+//    public long getMyPosition() {
+//        return myPosition;
+//    }
 
-    public void setMyPosition(long myPosition) {
-        this.myPosition = myPosition;
-    }
+//    public void setMyPosition(long myPosition) {
+//        this.myPosition = myPosition;
+//    }
 
     public BOTTree<PCRTestDate> getTesty() {
         return testy;
@@ -187,7 +191,6 @@ public class Osoba implements IData<Osoba> {
                 ", priezvisko='" + priezvisko + '\'' +
                 ", datumNarodenia=" + datumNarodenia +
                 ", rodCislo='" + rodCislo + '\'' +
-                ", testy=" + testy +
                 ", valid=" + valid +
                 '}';
     }

@@ -15,7 +15,6 @@ public class PCRTest implements IData<PCRTest> {
     private int kodKraja = -1;
     private boolean vysledok = false;
     private String poznamka = "";
-    private long osobaPosition;
     protected Date datum;
     private boolean valid = true;
 
@@ -24,7 +23,7 @@ public class PCRTest implements IData<PCRTest> {
     private static final int RODCISLO_LENGTH = 10;
     private static final int POZNAMKA_LENGTH = 20;
 
-    public PCRTest(String kodTestu, String rodCisloPacienta, int kodPracoviska, int kodOkresu, int kodKraja, boolean vysledok, String poznamka, Date datum, long osobaPosition) {
+    public PCRTest(String kodTestu, String rodCisloPacienta, int kodPracoviska, int kodOkresu, int kodKraja, boolean vysledok, String poznamka, Date datum) {
         if (datum == null) {
             this.datum = new Date(System.currentTimeMillis());
         } else {
@@ -37,7 +36,6 @@ public class PCRTest implements IData<PCRTest> {
         this.kodKraja = kodKraja;
         this.vysledok = vysledok;
         this.poznamka = poznamka;
-        this.osobaPosition = osobaPosition;
         //System.out.println(kodTestu);
     }
 
@@ -89,7 +87,6 @@ public class PCRTest implements IData<PCRTest> {
             dataOutputStream.writeInt(kodKraja);
             dataOutputStream.writeBoolean(vysledok);
             dataOutputStream.writeChars(poznamka);
-            dataOutputStream.writeLong(osobaPosition);
             dataOutputStream.writeLong(datum.getTime());
             dataOutputStream.writeBoolean(valid);
             return byteArrayOutputStream.toByteArray();
@@ -135,7 +132,6 @@ public class PCRTest implements IData<PCRTest> {
             }
             poznamka = stringBuilder.toString();
 
-            osobaPosition = dataInputStream.readLong();
             datum.setTime(dataInputStream.readLong());
             valid = dataInputStream.readBoolean();
         } catch (Exception e) {
@@ -145,7 +141,7 @@ public class PCRTest implements IData<PCRTest> {
 
     @Override
     public int getSize() {
-        return 3 * Integer.BYTES + 2 + 2 * Long.BYTES + Character.BYTES * (POZNAMKA_LENGTH + RODCISLO_LENGTH + KOD_LENGTH);
+        return 3 * Integer.BYTES + 2 + Long.BYTES + Character.BYTES * (POZNAMKA_LENGTH + RODCISLO_LENGTH + KOD_LENGTH);
     }
 
     @Override
@@ -168,9 +164,6 @@ public class PCRTest implements IData<PCRTest> {
         return this.kodTestu.compareTo(object.kodTestu);
     }
 
-    public long getOsobaPosition() {
-        return osobaPosition;
-    }
 
     public Date getDatum() {
         return datum;
@@ -222,7 +215,6 @@ public class PCRTest implements IData<PCRTest> {
                 ", kodKraja=" + kodKraja +
                 ", vysledok=" + vysledok +
                 ", poznamka='" + poznamka + '\'' +
-                ", osobaPosition=" + osobaPosition +
                 ", datum=" + datum +
                 ", valid=" + valid +
                 '}';
